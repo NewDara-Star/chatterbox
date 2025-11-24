@@ -44,5 +44,10 @@ syn_out/
 checkpoints/
 .gradio
 
+# Virtual environment
+venv/
+env/
+
 # Ignore generated sample .wav files
 **/*.wav
+test-*.wav
