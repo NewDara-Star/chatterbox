@@ -122,11 +122,13 @@ class DocumentParser:
         """
         Clean extracted text for TTS processing.
         
-        Removes:
-        - Excessive whitespace
-        - Page numbers (standalone numbers)
-        - Common header/footer patterns
-        - Multiple consecutive newlines
+        Advanced cleaning includes:
+        - Hyphenation fixes (rejoin words split across lines)
+        - Page number removal (standalone numbers, "Page X of Y")
+        - Header/footer patterns (common formats)
+        - Line merging (fix PDF hard wraps)
+        - Image caption removal
+        - Excessive whitespace cleanup
         
         Args:
             text: Raw extracted text
@@ -134,20 +136,66 @@ class DocumentParser:
         Returns:
             Cleaned text
         """
-        # Remove multiple spaces
-        text = re.sub(r' +', ' ', text)
+        # 1. Fix hyphenated words at line breaks
+        # Pattern: "word-\n" or "word-\r\n" -> "word"
+        text = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
         
-        # Remove standalone page numbers (numbers on their own line)
-        text = re.sub(r'\n\s*\d+\s*\n', '\n', text)
+        # 2. Remove common page number patterns
+        # "Page 5", "Page 5 of 20", "5 | Chapter Name", etc.
+        text = re.sub(r'\n\s*Page\s+\d+(\s+of\s+\d+)?\s*\n', '\n', text, flags=re.IGNORECASE)
+        text = re.sub(r'\n\s*\d+\s*\|\s*[\w\s]+\s*\n', '\n', text)  # "5 | Chapter"
+        text = re.sub(r'\n\s*\d+\s*\n', '\n', text)  # Standalone numbers
         
-        # Remove multiple consecutive newlines (keep max 2)
-        text = re.sub(r'\n{3,}', '\n\n', text)
+        # 3. Remove common header/footer patterns
+        # "Chapter X", "© Copyright", timestamps, URLs
+        text = re.sub(r'\n\s*Chapter\s+\d+\s*\n', '\n\n', text, flags=re.IGNORECASE)
+        text = re.sub(r'\n\s*©.*?\d{4}.*?\n', '\n', text)  # Copyright lines
+        text = re.sub(r'\n\s*https?://\S+\s*\n', '\n', text)  # URLs on their own line
         
-        # Remove leading/trailing whitespace from each line
+        # 4. Remove image/figure captions
+        # "Figure 1:", "Image:", "Photo by", etc.
+        text = re.sub(r'\n\s*(Figure|Fig\.|Image|Photo|Illustration)\s*\d*\s*:?.*?\n', '\n', text, flags=re.IGNORECASE)
+        
+        # 5. Merge broken lines (PDF hard wraps)
+        # If a line ends with a lowercase letter and the next starts with lowercase, merge them
+        # But preserve paragraph breaks (double newlines)
+        lines = text.split('\n')
+        merged_lines = []
+        i = 0
+        while i < len(lines):
+            current = lines[i].strip()
+            if not current:
+                merged_lines.append('')
+                i += 1
+                continue
+                
+            # Check if we should merge with next line
+            if i + 1 < len(lines):
+                next_line = lines[i + 1].strip()
+                # Merge if current ends with lowercase and next starts with lowercase
+                # (indicates mid-sentence break)
+                if (current and next_line and 
+                    current[-1].islower() and 
+                    next_line[0].islower() and
+                    not current.endswith(('.', '!', '?', ':', ';'))):
+                    merged_lines.append(current + ' ' + next_line)
+                    i += 2
+                    continue
+            
+            merged_lines.append(current)
+            i += 1
+        
+        text = '\n'.join(merged_lines)
+        
+        # 6. Clean up excessive whitespace
+        text = re.sub(r' +', ' ', text)  # Multiple spaces -> single space
+        text = re.sub(r'\n{3,}', '\n\n', text)  # Max 2 consecutive newlines
+        
+        # 7. Remove leading/trailing whitespace from each line
         lines = [line.strip() for line in text.split('\n')]
         text = '\n'.join(lines)
         
-        # Remove empty lines at start and end
+        # 8. Remove empty lines at start and end
         text = text.strip()
         
         return text
