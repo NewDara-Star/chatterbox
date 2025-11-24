@@ -94,3 +94,62 @@ Potential improvements for future versions:
 - OCR support for scanned PDFs
 
 ---
+
+## Feature 2: Voice Management
+
+**Status**: ✅ Completed  
+**Date**: 2025-11-24
+
+### Overview
+
+The voice manager allows users to save, organize, and retrieve voice references for audiobook generation. It provides a named system for managing multiple cloned voices.
+
+### Implementation Details
+
+**File**: `voice_manager.py`
+
+**Key Components**:
+
+1. **VoiceManager Class**
+   - Manages a dedicated `voices/` directory
+   - Stores metadata in `voices.json`
+   - Handles file I/O and sanitization
+
+2. **Metadata System**
+   - Tracks voice name, description, creation date, and file info
+   - Allows persistent storage of voice settings
+   - JSON-based for human readability and easy editing
+
+3. **File Management**
+   - Sanitizes filenames for cross-platform compatibility
+   - Supports renaming and deletion
+   - Prevents overwriting existing voices without explicit action
+
+### M4 Optimization
+
+- Efficient file I/O operations
+- Minimal memory footprint (metadata only loaded when needed)
+- Fast directory scanning
+
+### Testing
+
+**Test Coverage**:
+- ✅ Saving voices with custom names
+- ✅ Listing voices with metadata
+- ✅ Retrieving voice paths
+- ✅ Renaming voices
+- ✅ Deleting voices and cleanup
+
+**Test Results**:
+- All operations verified successfully
+- File system operations confirmed correct
+- Metadata consistency verified
+
+### Future Enhancements
+
+- Voice preview generation
+- Voice similarity scoring
+- Categorization/Tagging
+- Cloud sync support
+
+---
