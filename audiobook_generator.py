@@ -166,6 +166,15 @@ class AudiobookGenerator:
             
         full_audio = np.concatenate(audio_segments)
         
+        # Normalize audio to -3dB to ensure consistent volume
+        max_val = np.abs(full_audio).max()
+        if max_val > 0:
+            target_db = -3.0
+            target_amp = 10 ** (target_db / 20)
+            gain = target_amp / max_val
+            full_audio = full_audio * gain
+            print(f"Normalized audio (gain: {gain:.2f}x)")
+        
         # 5. Save Output
         if progress_callback:
             progress_callback(0.95, "Saving output file...")
