@@ -15,7 +15,7 @@ from voice_manager import VoiceManager
 from audiobook_utils import estimate_processing_time
 
 # Initialize components
-generator = AudiobookGenerator()
+# The generator is now initialized within _run_job to handle dynamic parameters like use_llm_cleanup
 voice_manager = VoiceManager()
 
 class JobManager:
@@ -28,7 +28,7 @@ class JobManager:
         self.error = None
         self._lock = threading.Lock()
         
-    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
         """Start a generation job in a background thread."""
         with self._lock:
             if self.status == "RUNNING":
@@ -43,17 +43,20 @@ class JobManager:
         # Start thread
         thread = threading.Thread(
             target=self._run_job,
-            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty)
+            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx)
         )
         thread.daemon = True
         thread.start()
         return True, "Job started"
 
-    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
         """Internal method to run the job."""
         output_path = "generated_audiobook.wav"
         
         try:
+            # Initialize generator here to pass use_llm_cleanup dynamically
+            generator = AudiobookGenerator(use_llm_cleanup=use_llm_cleanup)
+
             # Determine which voice to use
             voice_path = None
             if custom_voice_file:
@@ -74,6 +77,7 @@ class JobManager:
                 voice_name=voice_name if not custom_voice_file else None,
                 voice_path=voice_path,
                 progress_callback=update_progress,
+                detect_sfx=detect_sfx,
                 exaggeration=exaggeration,
                 temperature=temperature,
                 cfg_weight=cfg_weight,
@@ -139,7 +143,11 @@ def analyze_document(file):
         return "No file uploaded", "", ""
     
     try:
-        text, metadata = generator.parser.parse_document(file.name)
+        # Create a parser just for analysis (no LLM cleanup needed here)
+        from audiobook_utils import DocumentParser
+        parser = DocumentParser(use_llm_cleanup=False)
+        
+        text, metadata = parser.parse_document(file.name)
         
         info = f"""
         **Document Analysis:**
@@ -157,7 +165,7 @@ def analyze_document(file):
     except Exception as e:
         return f"Error analyzing document: {str(e)}", "", ""
 
-def start_generation(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+def start_generation(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx):
     """Trigger the background generation job."""
     if not file_path:
         raise gr.Error("Please upload and analyze a document first.")
@@ -173,7 +181,8 @@ def start_generation(file_path, voice_name, custom_voice_file, exaggeration, tem
         
     success, msg = job_manager.start_job(
         file_path, voice_name, custom_voice_file, 
-        exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty
+        exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty,
+        use_llm_cleanup, detect_sfx
     )
     
     if not success:
@@ -265,6 +274,29 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     min_p = gr.Slider(0.0, 1.0, step=0.01, label="Min P", value=0.05, info="Lower bound for sampling")
                     top_p = gr.Slider(0.0, 1.0, step=0.01, label="Top P", value=1.0, info="Cumulative probability cutoff")
 
+
+            # AI Text Processing (Tier 2)
+            with gr.Accordion("🧠 AI Text Processing (Experimental)", open=False):
+                gr.Markdown("""
+                **Advanced text enhancement using local AI models:**
+                - **AI Text Cleanup**: Uses Qwen2.5-1.5B to intelligently remove headers/footers and fix OCR errors
+                - **Sound Effect Detection**: Analyzes text and suggests ambient sounds to enhance the audiobook
+                
+                ⚠️ **Note**: These features are slower but significantly improve quality. First use will download ~3GB model.
+                """)
+                
+                use_llm_cleanup = gr.Checkbox(
+                    label="Enable AI text cleanup",
+                    value=False,
+                    info="Slower but removes artifacts more intelligently"
+                )
+                
+                detect_sfx = gr.Checkbox(
+                    label="Detect and suggest sound effects",
+                    value=False,
+                    info="Saves suggestions to sfx_suggestions.json for review"
+                )
+
             # Step 3: Generate
             gr.Markdown("### 3. Generate")
             generate_btn = gr.Button("🚀 Generate Audiobook", variant="primary", size="lg")
@@ -300,7 +332,9 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     cfg_weight,
                     min_p,
                     top_p,
-                    repetition_penalty
+                    repetition_penalty,
+                    use_llm_cleanup,
+                    detect_sfx
                 ],
                 outputs=[timer, status_msg] # Enable timer
             )

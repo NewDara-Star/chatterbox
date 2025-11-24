@@ -9,7 +9,7 @@ Optimized for Apple Silicon (M4) with efficient text processing.
 
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import PyPDF2
 from docx import Document
 
@@ -17,9 +17,20 @@ from docx import Document
 class DocumentParser:
     """Parse documents and extract clean text for TTS processing."""
     
-    def __init__(self):
-        """Initialize the document parser."""
+    def __init__(self, use_llm_cleanup: bool = False):
+        """
+        Initialize the document parser.
+        
+        Args:
+            use_llm_cleanup: If True, use SLM for intelligent text cleanup (slower but higher quality)
+        """
         self.supported_formats = ['.pdf', '.doc', '.docx']
+        self.use_llm_cleanup = use_llm_cleanup
+        self.enhancer = None
+        
+        if use_llm_cleanup:
+            from text_enhancer import TextEnhancer
+            self.enhancer = TextEnhancer()
     
     def parse_document(self, file_path: str) -> Tuple[str, dict]:
         """
@@ -57,8 +68,13 @@ class DocumentParser:
         else:
             raise ValueError(f"Unsupported format: {extension}")
         
-        # Clean the text
+        # Clean the text (Tier 1: regex-based)
         text = self._clean_text(text)
+        
+        # Tier 2: SLM-powered cleanup (optional)
+        if self.use_llm_cleanup and self.enhancer:
+            print("Applying AI text cleanup...")
+            text = self.enhancer.clean_text_with_llm(text)
         
         # Generate metadata
         metadata = {

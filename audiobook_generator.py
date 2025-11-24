@@ -26,12 +26,13 @@ from voice_manager import VoiceManager
 class AudiobookGenerator:
     """Generate audiobooks from documents using Chatterbox TTS."""
     
-    def __init__(self, device: str = None):
+    def __init__(self, device: str = None, use_llm_cleanup: bool = False):
         """
         Initialize the audiobook generator.
         
         Args:
             device: Device to use (cuda, mps, cpu). Auto-detected if None.
+            use_llm_cleanup: If True, use SLM for intelligent text cleanup
         """
         if device is None:
             if torch.cuda.is_available():
@@ -45,7 +46,7 @@ class AudiobookGenerator:
         print(f"Initializing AudiobookGenerator on {device}...")
         
         self.model = ChatterboxTTS.from_pretrained(device=device)
-        self.parser = DocumentParser()
+        self.parser = DocumentParser(use_llm_cleanup=use_llm_cleanup)
         self.voice_manager = VoiceManager()
         
         # M4 Optimization: Determine optimal worker count
@@ -86,6 +87,7 @@ class AudiobookGenerator:
         voice_name: Optional[str] = None,
         voice_path: Optional[str] = None,
         progress_callback: Optional[Callable[[float, str], None]] = None,
+        detect_sfx: bool = False,
         # Advanced audio settings
         exaggeration: float = 0.5,
         temperature: float = 0.8,
@@ -103,6 +105,7 @@ class AudiobookGenerator:
             voice_name: Name of saved voice to use
             voice_path: Path to specific voice file (overrides voice_name)
             progress_callback: Function to call with progress updates
+            detect_sfx: If True, detect and save sound effect suggestions
             exaggeration: Exaggeration factor (0.5 = neutral)
             temperature: Sampling temperature (0.8 default)
             cfg_weight: Classifier-free guidance weight (0.5 default)
@@ -124,6 +127,24 @@ class AudiobookGenerator:
         chunks = self.parser.chunk_text(text)
         
         print(f"Document parsed: {metadata['page_count']} pages, {len(chunks)} chunks")
+        
+        # 1.5. Detect sound effects (optional)
+        if detect_sfx:
+            if progress_callback:
+                progress_callback(0.08, "Detecting sound effects...")
+            
+            print("Analyzing text for sound effects...")
+            from text_enhancer import TextEnhancer
+            enhancer = TextEnhancer(device=self.device)
+            sfx_suggestions = enhancer.detect_sound_effects(text)
+            
+            # Save suggestions to JSON
+            import json
+            sfx_path = Path("sfx_suggestions.json")
+            with open(sfx_path, 'w') as f:
+                json.dump(sfx_suggestions, f, indent=2)
+            
+            print(f"Saved {len(sfx_suggestions)} SFX suggestions to {sfx_path}")
         
         # 2. Prepare Voice
         ref_voice_path = None
