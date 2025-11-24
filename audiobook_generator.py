@@ -49,10 +49,36 @@ class AudiobookGenerator:
         self.voice_manager = VoiceManager()
         
         # M4 Optimization: Determine optimal worker count
-        # Leave 2 cores for system/UI
-        self.num_workers = max(1, min(multiprocessing.cpu_count() - 2, 8))
-        print(f"Parallel processing enabled: {self.num_workers} workers")
+        # MPS is not thread-safe for parallel inference, so we force sequential
+        if self.device == "mps":
+            print("MPS detected: Forcing sequential processing for stability")
+            self.num_workers = 1
+        else:
+            # Leave 2 cores for system/UI
+            self.num_workers = max(1, min(multiprocessing.cpu_count() - 2, 8))
+            print(f"Parallel processing enabled: {self.num_workers} workers")
     
+    def _convert_to_wav(self, input_path: str) -> str:
+        """Convert audio to WAV for stable loading."""
+        try:
+            import librosa
+            import soundfile as sf
+            
+            path = Path(input_path)
+            if path.suffix.lower() == '.wav':
+                return input_path
+                
+            print(f"Converting {path.name} to WAV for stability...")
+            y, sr = librosa.load(input_path, sr=None)
+            
+            # Save as temp wav
+            temp_wav = path.with_suffix('.temp.wav')
+            sf.write(str(temp_wav), y, sr)
+            return str(temp_wav)
+        except Exception as e:
+            print(f"Warning: Failed to convert audio to WAV: {e}")
+            return input_path
+
     def generate_audiobook(
         self,
         input_path: str,
@@ -109,6 +135,8 @@ class AudiobookGenerator:
                 raise ValueError(f"Voice '{voice_name}' not found")
         
         if ref_voice_path:
+            # Convert to WAV for stability
+            ref_voice_path = self._convert_to_wav(str(ref_voice_path))
             print(f"Using voice reference: {ref_voice_path}")
         else:
             print("Using default model voice")
@@ -117,7 +145,7 @@ class AudiobookGenerator:
         if progress_callback:
             progress_callback(0.1, f"Generating audio for {len(chunks)} chunks...")
             
-        print(f"Generating audio with {self.num_workers} parallel workers...")
+        print(f"Generating audio with {self.num_workers} workers...")
         
         # Helper function for parallel processing
         def process_chunk(chunk_data):
