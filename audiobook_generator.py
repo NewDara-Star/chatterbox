@@ -147,6 +147,14 @@ class AudiobookGenerator:
             
         print(f"Generating audio with {self.num_workers} workers...")
         
+        # Create temp directory for chunks
+        temp_dir = Path("temp_chunks")
+        temp_dir.mkdir(exist_ok=True)
+        chunk_files = []
+        
+        import soundfile as sf
+        import gc
+        
         # Helper function for parallel processing
         def process_chunk(chunk_data):
             idx, text_chunk = chunk_data
@@ -163,18 +171,27 @@ class AudiobookGenerator:
                     repetition_penalty=repetition_penalty
                 )
                 wav_np = wav.squeeze(0).cpu().numpy()
-                return (idx, wav_np)
+                
+                # Save to temp file immediately to free memory
+                chunk_filename = temp_dir / f"chunk_{idx:05d}.wav"
+                sf.write(str(chunk_filename), wav_np, self.model.sr)
+                
+                # Explicit cleanup
+                del wav
+                del wav_np
+                if self.device == "mps":
+                    torch.mps.empty_cache()
+                
+                return (idx, str(chunk_filename))
             except Exception as e:
                 print(f"Error generating chunk {idx}: {e}")
-                # Return silence on error to maintain sync
-                silence = np.zeros(int(self.model.sr * 1.0))
-                return (idx, silence)
+                return (idx, None)
 
         # Prepare chunk data with indices
         chunk_data = list(enumerate(chunks))
-        results = []
         
-        # Process in parallel
+        # Process in parallel (or sequential for MPS)
+        # Note: Even with sequential, we use the executor for consistency
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             # Submit all tasks
             futures = [executor.submit(process_chunk, data) for data in chunk_data]
@@ -182,34 +199,47 @@ class AudiobookGenerator:
             # Monitor progress
             completed = 0
             for future in tqdm(futures, desc="Generating Audio"):
-                result = future.result()
-                results.append(result)
+                idx, chunk_path = future.result()
+                if chunk_path:
+                    chunk_files.append((idx, chunk_path))
+                
                 completed += 1
+                
+                # Aggressive memory cleanup
+                if completed % 5 == 0:
+                    gc.collect()
+                    if self.device == "mps":
+                        torch.mps.empty_cache()
                 
                 if progress_callback:
                     progress = 0.1 + (0.8 * completed / len(chunks))
                     progress_callback(progress, f"Generating chunk {completed}/{len(chunks)}")
         
-        # Sort results by index to ensure correct order
-        results.sort(key=lambda x: x[0])
-        
-        # Extract audio segments and add silence
-        audio_segments = []
-        silence = np.zeros(int(self.model.sr * 0.5))  # 0.5s silence
-        
-        for _, wav_data in results:
-            audio_segments.append(wav_data)
-            audio_segments.append(silence)
+        # Sort results by index
+        chunk_files.sort(key=lambda x: x[0])
         
         # 4. Combine Audio
         if progress_callback:
             progress_callback(0.9, "Combining audio segments...")
             
         print("Combining audio segments...")
-        if not audio_segments:
+        if not chunk_files:
             raise RuntimeError("No audio generated")
             
-        full_audio = np.concatenate(audio_segments)
+        # Combine from files
+        full_audio_segments = []
+        silence = np.zeros(int(self.model.sr * 0.5))
+        
+        for _, fpath in chunk_files:
+            data, _ = sf.read(fpath)
+            full_audio_segments.append(data)
+            full_audio_segments.append(silence)
+            
+        full_audio = np.concatenate(full_audio_segments)
+        
+        # Cleanup temp files
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)
         
         # Normalize audio to -3dB to ensure consistent volume
         max_val = np.abs(full_audio).max()
