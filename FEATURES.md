@@ -212,3 +212,58 @@ The core engine that combines document parsing, voice cloning, and TTS to genera
 - MP3 export (requires ffmpeg)
 
 ---
+
+## Feature 5: Gradio UI
+
+**Status**: ✅ Completed  
+**Date**: 2025-11-24
+
+### Overview
+
+A user-friendly web interface for the audiobook converter, built with Gradio. It provides a visual workflow for uploading documents, managing voices, and generating audiobooks.
+
+### Implementation Details
+
+**File**: `gradio_audiobook_app.py`
+
+**Key Components**:
+
+1. **Document Analysis Tab**
+   - Drag-and-drop upload for PDF and DOCX
+   - Instant analysis of page count, word count, and character count
+   - **Time Estimation**: Calculates expected processing time based on M4 performance
+
+2. **Voice Selection**
+   - Dropdown menu for saved named voices
+   - Option to upload a one-time voice reference
+   - Microphone recording support for quick voice cloning
+
+3. **Generation Workflow**
+   - One-click generation
+   - Real-time progress bar tracking parsing, generation, and saving
+   - Audio player to preview the result immediately
+   - Download button for the generated WAV file
+
+4. **Voice Management Tab**
+   - Interface to record/upload new voices
+   - Save voices with custom names and descriptions
+   - Persistent storage across sessions
+
+### Usage
+
+Run the app with:
+```bash
+./run_audiobook_app.sh
+```
+Access at `http://127.0.0.1:7861`
+
+### Testing
+
+**Test Coverage**:
+- ✅ UI layout and navigation
+- ✅ File upload and analysis
+- ✅ Voice saving and selection
+- ✅ Generation trigger and progress updates
+- ✅ Audio playback
+
+---
