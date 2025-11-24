@@ -132,7 +132,20 @@ class AudiobookGenerator:
         elif voice_name:
             ref_voice_path = self.voice_manager.get_voice_path(voice_name)
             if not ref_voice_path:
-                raise ValueError(f"Voice '{voice_name}' not found")
+                # List available voices for debugging
+                available = [v['name'] for v in self.voice_manager.list_voices()]
+                raise ValueError(
+                    f"Voice '{voice_name}' not found in voice library.\n"
+                    f"Available voices: {', '.join(available) if available else '(none)'}\n"
+                    f"Tip: Check spelling and capitalization, or refresh the voice list in the UI."
+                )
+            # Verify the file actually exists
+            if not ref_voice_path.exists():
+                raise FileNotFoundError(
+                    f"Voice file missing: {ref_voice_path}\n"
+                    f"The voice '{voice_name}' is registered but its audio file is gone.\n"
+                    f"Try re-uploading the voice or deleting and re-adding it."
+                )
         
         if ref_voice_path:
             # Convert to WAV for stability

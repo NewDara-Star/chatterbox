@@ -161,6 +161,15 @@ def start_generation(file_path, voice_name, custom_voice_file, exaggeration, tem
     """Trigger the background generation job."""
     if not file_path:
         raise gr.Error("Please upload and analyze a document first.")
+    
+    # Defensive check: if a voice_name is selected, verify it exists
+    if voice_name and not custom_voice_file:
+        available_voices = [v['name'] for v in voice_manager.list_voices()]
+        if voice_name not in available_voices:
+            raise gr.Error(
+                f"Voice '{voice_name}' not found. Available voices: {', '.join(available_voices)}. "
+                f"Try refreshing the voice list or re-uploading the voice."
+            )
         
     success, msg = job_manager.start_job(
         file_path, voice_name, custom_voice_file, 
