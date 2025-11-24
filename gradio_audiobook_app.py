@@ -64,7 +64,7 @@ def analyze_document(file):
     except Exception as e:
         return f"Error analyzing document: {str(e)}", "", ""
 
-def generate_audiobook_ui(file_path, voice_name, custom_voice_file, progress=gr.Progress()):
+def generate_audiobook_ui(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, progress=gr.Progress()):
     """Generate audiobook from UI."""
     if not file_path:
         raise gr.Error("Please upload and analyze a document first.")
@@ -89,7 +89,13 @@ def generate_audiobook_ui(file_path, voice_name, custom_voice_file, progress=gr.
             output_path=output_path,
             voice_name=voice_name if not custom_voice_file else None,
             voice_path=voice_path,
-            progress_callback=update_progress
+            progress_callback=update_progress,
+            exaggeration=exaggeration,
+            temperature=temperature,
+            cfg_weight=cfg_weight,
+            min_p=min_p,
+            top_p=top_p,
+            repetition_penalty=repetition_penalty
         )
         
         return result_path, f"Audiobook generated successfully! Saved to {result_path}"
@@ -140,6 +146,18 @@ with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) a
                         sources=["upload", "microphone"]
                     )
             
+            # Advanced Settings
+            with gr.Accordion("Advanced Audio Settings", open=False):
+                with gr.Row():
+                    exaggeration = gr.Slider(0.25, 2.0, step=0.05, label="Exaggeration", value=0.5, info="Higher = more dramatic (can be unstable)")
+                    cfg_weight = gr.Slider(0.0, 1.0, step=0.05, label="CFG/Pace", value=0.5, info="Classifier-free guidance weight")
+                with gr.Row():
+                    temperature = gr.Slider(0.05, 5.0, step=0.05, label="Temperature", value=0.8, info="Higher = more random/creative")
+                    repetition_penalty = gr.Slider(1.0, 2.0, step=0.1, label="Repetition Penalty", value=1.2, info="Prevents repeating phrases")
+                with gr.Row():
+                    min_p = gr.Slider(0.0, 1.0, step=0.01, label="Min P", value=0.05, info="Lower bound for sampling")
+                    top_p = gr.Slider(0.0, 1.0, step=0.01, label="Top P", value=1.0, info="Cumulative probability cutoff")
+
             # Step 3: Generate
             gr.Markdown("### 3. Generate")
             generate_btn = gr.Button("🚀 Generate Audiobook", variant="primary", size="lg")
@@ -162,7 +180,17 @@ with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) a
             
             generate_btn.click(
                 generate_audiobook_ui,
-                inputs=[file_path_state, voice_dropdown, custom_voice],
+                inputs=[
+                    file_path_state, 
+                    voice_dropdown, 
+                    custom_voice,
+                    exaggeration,
+                    temperature,
+                    cfg_weight,
+                    min_p,
+                    top_p,
+                    repetition_penalty
+                ],
                 outputs=[output_audio, status_msg]
             )
         

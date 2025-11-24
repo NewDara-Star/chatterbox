@@ -59,7 +59,14 @@ class AudiobookGenerator:
         output_path: str,
         voice_name: Optional[str] = None,
         voice_path: Optional[str] = None,
-        progress_callback: Optional[Callable[[float, str], None]] = None
+        progress_callback: Optional[Callable[[float, str], None]] = None,
+        # Advanced audio settings
+        exaggeration: float = 0.5,
+        temperature: float = 0.8,
+        cfg_weight: float = 0.5,
+        min_p: float = 0.05,
+        top_p: float = 1.0,
+        repetition_penalty: float = 1.2
     ) -> str:
         """
         Generate an audiobook from a document.
@@ -69,7 +76,13 @@ class AudiobookGenerator:
             output_path: Path to save output audio (WAV)
             voice_name: Name of saved voice to use
             voice_path: Path to specific voice file (overrides voice_name)
-            progress_callback: Function to call with progress updates (0.0-1.0, status_msg)
+            progress_callback: Function to call with progress updates
+            exaggeration: Exaggeration factor (0.5 = neutral)
+            temperature: Sampling temperature (0.8 default)
+            cfg_weight: Classifier-free guidance weight (0.5 default)
+            min_p: Min-p sampling (0.05 default)
+            top_p: Top-p sampling (1.0 default)
+            repetition_penalty: Repetition penalty (1.2 default)
             
         Returns:
             Path to generated audiobook file
@@ -114,8 +127,12 @@ class AudiobookGenerator:
                 wav = self.model.generate(
                     text_chunk,
                     audio_prompt_path=str(ref_voice_path) if ref_voice_path else None,
-                    exaggeration=0.5,
-                    cfg_weight=0.5
+                    exaggeration=exaggeration,
+                    temperature=temperature,
+                    cfg_weight=cfg_weight,
+                    min_p=min_p,
+                    top_p=top_p,
+                    repetition_penalty=repetition_penalty
                 )
                 wav_np = wav.squeeze(0).cpu().numpy()
                 return (idx, wav_np)
