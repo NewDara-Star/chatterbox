@@ -7,6 +7,8 @@ Allows users to upload documents, manage voices, and generate audiobooks.
 
 import gradio as gr
 import os
+import threading
+import time
 from pathlib import Path
 from audiobook_generator import AudiobookGenerator
 from voice_manager import VoiceManager
@@ -15,6 +17,97 @@ from audiobook_utils import estimate_processing_time
 # Initialize components
 generator = AudiobookGenerator()
 voice_manager = VoiceManager()
+
+class JobManager:
+    """Manages background generation jobs."""
+    def __init__(self):
+        self.status = "IDLE"  # IDLE, RUNNING, COMPLETED, FAILED
+        self.progress = 0.0
+        self.message = "Ready"
+        self.result_path = None
+        self.error = None
+        self._lock = threading.Lock()
+        
+    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+        """Start a generation job in a background thread."""
+        with self._lock:
+            if self.status == "RUNNING":
+                return False, "Job already running"
+            
+            self.status = "RUNNING"
+            self.progress = 0.0
+            self.message = "Starting..."
+            self.result_path = None
+            self.error = None
+            
+        # Start thread
+        thread = threading.Thread(
+            target=self._run_job,
+            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty)
+        )
+        thread.daemon = True
+        thread.start()
+        return True, "Job started"
+
+    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+        """Internal method to run the job."""
+        output_path = "generated_audiobook.wav"
+        
+        try:
+            # Determine which voice to use
+            voice_path = None
+            if custom_voice_file:
+                voice_path = custom_voice_file
+            elif not voice_name:
+                print("No voice selected, using default model voice.")
+            
+            # Progress callback wrapper
+            def update_progress(p, msg):
+                with self._lock:
+                    self.progress = p
+                    self.message = msg
+            
+            # Generate
+            result_path = generator.generate_audiobook(
+                input_path=file_path,
+                output_path=output_path,
+                voice_name=voice_name if not custom_voice_file else None,
+                voice_path=voice_path,
+                progress_callback=update_progress,
+                exaggeration=exaggeration,
+                temperature=temperature,
+                cfg_weight=cfg_weight,
+                min_p=min_p,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty
+            )
+            
+            with self._lock:
+                self.status = "COMPLETED"
+                self.progress = 1.0
+                self.message = "Generation complete!"
+                self.result_path = result_path
+                
+        except Exception as e:
+            print(f"Job failed: {e}")
+            with self._lock:
+                self.status = "FAILED"
+                self.error = str(e)
+                self.message = f"Failed: {str(e)}"
+
+    def get_status(self):
+        """Get current job status."""
+        with self._lock:
+            return {
+                "status": self.status,
+                "progress": self.progress,
+                "message": self.message,
+                "result": self.result_path,
+                "error": self.error
+            }
+
+# Global job manager
+job_manager = JobManager()
 
 def get_voice_choices():
     """Get list of available voices for dropdown."""
@@ -64,47 +157,52 @@ def analyze_document(file):
     except Exception as e:
         return f"Error analyzing document: {str(e)}", "", ""
 
-def generate_audiobook_ui(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, progress=gr.Progress()):
-    """Generate audiobook from UI."""
+def start_generation(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty):
+    """Trigger the background generation job."""
     if not file_path:
         raise gr.Error("Please upload and analyze a document first.")
-    
-    output_path = "generated_audiobook.wav"
-    
-    try:
-        # Determine which voice to use
-        voice_path = None
-        if custom_voice_file:
-            voice_path = custom_voice_file
-        elif not voice_name:
-            gr.Info("No voice selected, using default model voice.")
         
-        # Progress callback wrapper
-        def update_progress(p, msg):
-            progress(p, desc=msg)
+    success, msg = job_manager.start_job(
+        file_path, voice_name, custom_voice_file, 
+        exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty
+    )
+    
+    if not success:
+        raise gr.Error(msg)
         
-        # Generate
-        result_path = generator.generate_audiobook(
-            input_path=file_path,
-            output_path=output_path,
-            voice_name=voice_name if not custom_voice_file else None,
-            voice_path=voice_path,
-            progress_callback=update_progress,
-            exaggeration=exaggeration,
-            temperature=temperature,
-            cfg_weight=cfg_weight,
-            min_p=min_p,
-            top_p=top_p,
-            repetition_penalty=repetition_penalty
+    return gr.update(active=True), "Job started..."
+
+def check_progress():
+    """Poll for progress updates."""
+    status = job_manager.get_status()
+    
+    # Update progress bar
+    # Note: Gradio's progress bar is tricky with polling, so we use a slider or just text for now
+    # Ideally we'd use the proper Progress component but it's tied to the function call
+    
+    msg = f"Status: {status['status']} - {status['message']}"
+    
+    if status['status'] == "COMPLETED":
+        return (
+            gr.update(value=status['result'], visible=True), # Audio output
+            msg,
+            gr.update(active=False) # Stop timer
         )
-        
-        return result_path, f"Audiobook generated successfully! Saved to {result_path}"
-        
-    except Exception as e:
-        raise gr.Error(f"Generation failed: {str(e)}")
+    elif status['status'] == "FAILED":
+        return (
+            None,
+            msg,
+            gr.update(active=False) # Stop timer
+        )
+    else:
+        return (
+            None,
+            msg,
+            gr.update(active=True) # Keep timer running
+        )
 
 # Build UI
-with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
     gr.Markdown("# 📚 Chatterbox Audiobook Converter")
     gr.Markdown("Convert PDF and DOCX files to audiobooks using your cloned voice.")
     
@@ -162,9 +260,12 @@ with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) a
             gr.Markdown("### 3. Generate")
             generate_btn = gr.Button("🚀 Generate Audiobook", variant="primary", size="lg")
             
-            # Output
-            output_audio = gr.Audio(label="Generated Audiobook", type="filepath")
-            status_msg = gr.Textbox(label="Status", interactive=False)
+            # Output Area
+            status_msg = gr.Textbox(label="Status", interactive=False, value="Ready")
+            output_audio = gr.Audio(label="Generated Audiobook", type="filepath", visible=False)
+            
+            # Timer for polling (initially hidden/inactive)
+            timer = gr.Timer(1.0, active=False)
             
             # Events
             analyze_btn.click(
@@ -178,8 +279,9 @@ with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) a
                 outputs=[voice_dropdown]
             )
             
+            # Start generation
             generate_btn.click(
-                generate_audiobook_ui,
+                start_generation,
                 inputs=[
                     file_path_state, 
                     voice_dropdown, 
@@ -191,7 +293,13 @@ with gr.Blocks(title="Chatterbox Audiobook Converter", theme=gr.themes.Soft()) a
                     top_p,
                     repetition_penalty
                 ],
-                outputs=[output_audio, status_msg]
+                outputs=[timer, status_msg] # Enable timer
+            )
+            
+            # Poll for updates
+            timer.tick(
+                check_progress,
+                outputs=[output_audio, status_msg, timer]
             )
         
         # Tab 2: Manage Voices
