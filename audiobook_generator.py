@@ -28,13 +28,12 @@ from voice_manager import VoiceManager
 class AudiobookGenerator:
     """Generate audiobooks from documents using Chatterbox TTS."""
     
-    def __init__(self, device: str = None, use_llm_cleanup: bool = False):
+    def __init__(self, device: str = None):
         """
         Initialize the audiobook generator.
         
         Args:
             device: Device to use (cuda, mps, cpu). Auto-detected if None.
-            use_llm_cleanup: If True, use SLM for intelligent text cleanup
         """
         if device is None:
             if torch.cuda.is_available():
@@ -48,7 +47,7 @@ class AudiobookGenerator:
         print(f"Initializing AudiobookGenerator on {device}...")
         
         self.model = ChatterboxTTS.from_pretrained(device=device)
-        self.parser = DocumentParser(use_llm_cleanup=use_llm_cleanup)
+        self.parser = DocumentParser()
         self.voice_manager = VoiceManager()
         
         # M4 Optimization: Determine optimal worker count
@@ -100,18 +99,19 @@ class AudiobookGenerator:
             
         return saved_files
 
-    def analyze_chapter_with_director(self, chapter_file_path: str, api_key: Optional[str] = None) -> str:
+    def analyze_chapter_with_director(self, chapter_file_path: str, api_key: Optional[str] = None, provider: str = None) -> str:
         """
-        Analyze a chapter text file using the Director (Claude).
+        Analyze a chapter text file using the Director (Claude or OpenAI).
         
         Args:
             chapter_file_path: Path to the chapter text file
-            api_key: Anthropic API key (optional)
+            api_key: API key (optional)
+            provider: "anthropic" or "openai"
             
         Returns:
             Path to the generated JSON direction sheet
         """
-        print(f"Directing chapter: {chapter_file_path}")
+        print(f"Directing chapter: {chapter_file_path} using {provider}")
         
         # Read chapter text
         path = Path(chapter_file_path)
@@ -129,7 +129,7 @@ class AudiobookGenerator:
             
         # Initialize Director
         from director import Director
-        director = Director(api_key=api_key)
+        director = Director(api_key=api_key, provider=provider)
         
         # Analyze
         direction_sheet = director.analyze_chapter(content, chapter_title=title)
@@ -188,43 +188,10 @@ class AudiobookGenerator:
         chunks = self.parser.chunk_text(text)
         print(f"  - {len(chunks)} chunks")
         
-        # 2. SFX Detection (Tier 1/2)
-        sfx_suggestions = []
+        # 2. SFX Detection (Legacy removed, use Director)
         if detect_sfx:
-            # Optimization: Keyword filtering to reduce SLM load
-            sfx_keywords = [
-                "sound", "noise", "voice", "cry", "scream", "shout", "whisper",
-                "bang", "crash", "thud", "click", "creak", "snap", "knock",
-                "rain", "wind", "thunder", "storm", "water", "river", "sea",
-                "bird", "dog", "wolf", "horse", "animal",
-                "step", "walk", "run", "footstep", "door", "window",
-                "gun", "shot", "explosion", "fire", "burn", "ring", "bell"
-            ]
-            
-            # Fast check (case-insensitive)
-            text_lower = text.lower()
-            has_keywords = any(k in text_lower for k in sfx_keywords)
-            
-            if not has_keywords:
-                print("  - No SFX keywords found, skipping expensive analysis.")
-            else:
-                try:
-                    print("  - Analyzing for SFX...")
-                    from text_enhancer import TextEnhancer
-                    enhancer = TextEnhancer(device=self.device)
-                    # Analyze first 2000 chars for mood (Sparse Analysis)
-                    scene_data = enhancer.analyze_scene(text[:2000])
-                    
-                    # Use legacy detection for now, but scoped to chapter
-                    sfx_suggestions = enhancer.detect_sound_effects(text)
-                    
-                    # Save chapter SFX
-                    sfx_path = output_dir / f"chapter_{chapter_idx}_sfx.json"
-                    import json
-                    with open(sfx_path, 'w') as f:
-                        json.dump(sfx_suggestions, f, indent=2)
-                except Exception as e:
-                    print(f"  - Warning: SFX detection failed: {e}")
+            print("  - SFX detection enabled (Legacy mode disabled). Use Director for best results.")
+            pass
 
         # 3. Generate Audio
         temp_dir = output_dir / f"temp_chunks_{chapter_idx}"

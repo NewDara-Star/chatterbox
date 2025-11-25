@@ -19,6 +19,12 @@ def test_director_init():
     assert hasattr(director, "analyze_chapter")
     print("Method analyze_chapter exists.")
     
+    # Test OpenAI init
+    print("Testing OpenAI initialization...")
+    director_openai = Director(api_key="dummy", provider="openai")
+    assert director_openai.provider == "openai"
+    print("Director initialized (OpenAI).")
+    
     print("SUCCESS: Director class structure verified.")
 
 if __name__ == "__main__":

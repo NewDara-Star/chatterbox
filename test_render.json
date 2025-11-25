@@ -1,0 +1,15 @@
+{
+    "chapter_title": "Test Render",
+    "overall_mood": "Testing",
+    "scenes": [
+        {
+            "id": 1,
+            "text_segment": "This is a test scene for video rendering.",
+            "visual_prompt": "A test image",
+            "audio_cues": [],
+            "mood": "Neutral",
+            "pacing": "Medium",
+            "image_path": "/Users/Star/.gemini/antigravity/brain/6505c5a1-467f-42cd-a20f-1c6b351137cb/uploaded_image_1764108024644.png"
+        }
+    ]
+}

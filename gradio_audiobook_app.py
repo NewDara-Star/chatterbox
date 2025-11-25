@@ -10,6 +10,11 @@ import os
 import threading
 import time
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from audiobook_generator import AudiobookGenerator
 from voice_manager import VoiceManager
 from audiobook_utils import estimate_processing_time
@@ -37,26 +42,48 @@ class JobManager:
             self.status = "RUNNING"
             self.progress = 0.0
             self.message = "Starting..."
-            self.result_path = None
-            self.error = None
-            
-        # Start thread
+        # self.status = "IDLE"  # IDLE, RUNNING, COMPLETED, FAILED
+        # self.progress = 0.0
+        # self.message = "Ready"
+        # self.result_path = None
+        # self.error = None
+        # self._lock = threading.Lock()
+        self.jobs = {}  # Stores status for multiple jobs
+        self.lock = threading.Lock()
+        self.current_job_id = None # To track the currently active job for UI polling
+
+    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx=False):
+        """Start a new background job."""
+        job_id = str(uuid.uuid4())
+        
+        # Create thread
         thread = threading.Thread(
             target=self._run_job,
-            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx)
+            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx),
+            kwargs={'job_id': job_id}
         )
-        thread.daemon = True
-        thread.start()
-        return True, "Job started"
-
-    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
-        """Internal method to run the job."""
-        output_path = "generated_audiobook.wav"
         
-        try:
-            # Initialize generator here to pass use_llm_cleanup dynamically
-            generator = AudiobookGenerator(use_llm_cleanup=use_llm_cleanup)
+        with self.lock:
+            self.jobs[job_id] = {
+                'status': 'starting',
+                'progress': 0.0,
+                'message': 'Initializing...',
+                'result': None,
+                'thread': thread,
+                'start_time': time.time(),
+                'error': None
+            }
+            self.current_job_id = job_id
+            
+        thread.start()
+        return 0.0, "Starting job..."
 
+    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx=False, job_id=None):
+        """Worker function."""
+        try:
+            # Initialize generator here to pass parameters dynamically
+            generator = AudiobookGenerator()
+            
             # Determine which voice to use
             voice_path = None
             if custom_voice_file:
@@ -64,19 +91,18 @@ class JobManager:
             elif not voice_name:
                 print("No voice selected, using default model voice.")
             
-            # Progress callback wrapper
-            def update_progress(p, msg):
-                with self._lock:
-                    self.progress = p
-                    self.message = msg
+            def progress_callback(p, msg):
+                with self.lock:
+                    if job_id in self.jobs:
+                        self.jobs[job_id]['progress'] = p
+                        self.jobs[job_id]['message'] = msg
             
-            # Generate
-            result_path = generator.generate_audiobook(
+            output_path = generator.generate_audiobook(
                 input_path=file_path,
-                output_path=output_path,
+                output_path="generated_audiobook.wav",
                 voice_name=voice_name if not custom_voice_file else None,
                 voice_path=voice_path,
-                progress_callback=update_progress,
+                progress_callback=progress_callback,
                 detect_sfx=detect_sfx,
                 exaggeration=exaggeration,
                 temperature=temperature,
@@ -179,16 +205,13 @@ def start_generation(file_path, voice_name, custom_voice_file, exaggeration, tem
                 f"Try refreshing the voice list or re-uploading the voice."
             )
         
-    success, msg = job_manager.start_job(
+    progress_val, msg = job_manager.start_job(
         file_path, voice_name, custom_voice_file, 
         exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty,
-        use_llm_cleanup, detect_sfx
+        detect_sfx
     )
     
-    if not success:
-        raise gr.Error(msg)
-        
-    return gr.update(active=True), "Job started..."
+    return gr.update(value=progress_val, visible=True), msg
 
 def check_progress():
     """Poll for progress updates."""
@@ -352,9 +375,7 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             
             with gr.Row():
                 review_file_input = gr.File(label="Upload Document", file_types=[".pdf", ".doc", ".docx"])
-                with gr.Column():
-                    review_use_llm = gr.Checkbox(label="Use AI Cleanup (Qwen)", value=False)
-                    prepare_btn = gr.Button("Clean & Split Chapters", variant="primary")
+                prepare_btn = gr.Button("Clean & Split Chapters", variant="primary")
             
             chapter_list_state = gr.State([])
             current_chapter_path = gr.State()
@@ -368,21 +389,26 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             save_chapter_btn = gr.Button("Save Changes", variant="secondary")
             save_status_msg = gr.Textbox(label="Status", interactive=False)
             
-            gr.Markdown("### 3. The Director (Claude)")
+            gr.Markdown("### 3. The Director (AI Creative Lead)")
             with gr.Row():
-                api_key_input = gr.Textbox(label="Anthropic API Key (Optional if set in env)", type="password")
+                provider_radio = gr.Radio(
+                    choices=["Anthropic", "OpenAI"],
+                    value=None,
+                    label="AI Provider"
+                )
+                api_key_input = gr.Textbox(label="API Key (Optional if set in env)", type="password")
                 direct_btn = gr.Button("🎬 Direct Scene", variant="primary")
             
             director_output = gr.JSON(label="Direction Sheet (JSON)")
             
             # Helper functions for this tab
-            def prepare_chapters_ui(file, use_llm):
+            def prepare_chapters_ui(file):
                 if not file:
                     return gr.update(choices=[]), [], "Please upload a file first."
                 
                 try:
                     # Initialize generator just for this task
-                    gen = AudiobookGenerator(use_llm_cleanup=use_llm)
+                    gen = AudiobookGenerator()
                     output_dir = "chapter_drafts"
                     files = gen.prepare_chapters(file.name, output_dir)
                     
@@ -415,13 +441,18 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                 except Exception as e:
                     return f"Error saving: {e}"
 
-            def run_director(chapter_path, api_key):
+            def run_director(chapter_path, api_key, provider):
+                print(f"DEBUG: run_director called with provider={provider}, chapter={chapter_path}")
                 if not chapter_path:
                     return "Please select a chapter first."
                 
                 try:
                     gen = AudiobookGenerator()
-                    json_path = gen.analyze_chapter_with_director(chapter_path, api_key=api_key if api_key else None)
+                    json_path = gen.analyze_chapter_with_director(
+                        chapter_path, 
+                        api_key=api_key if api_key else None,
+                        provider=provider
+                    )
                     
                     import json
                     with open(json_path, 'r') as f:
@@ -433,7 +464,7 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             # Events
             prepare_btn.click(
                 prepare_chapters_ui,
-                inputs=[review_file_input, review_use_llm],
+                inputs=[review_file_input],
                 outputs=[chapter_dropdown, chapter_list_state, save_status_msg]
             )
             
@@ -451,55 +482,100 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             
             direct_btn.click(
                 run_director,
-                inputs=[current_chapter_path, api_key_input],
+                inputs=[current_chapter_path, api_key_input, provider_radio],
                 outputs=[director_output]
             )
 
-            direct_btn.click(
-                run_director,
-                inputs=[current_chapter_path, api_key_input],
-                outputs=[director_output]
-            )
+
 
         # Tab 3: Scene Manager (Visual Production)
         with gr.Tab("Scene Manager"):
             gr.Markdown("### 1. Load Direction Sheet")
             with gr.Row():
-                scene_json_file = gr.File(label="Upload Direction Sheet (JSON)", file_types=[".json"])
-                load_scenes_btn = gr.Button("Load Scenes", variant="secondary")
+                with gr.Column():
+                    scene_json_file = gr.File(label="Upload JSON File", file_types=[".json"])
+                with gr.Column():
+                    scene_json_text = gr.TextArea(label="Or Paste JSON Here", lines=5, placeholder='{"scenes": [...]}')
             
-            scenes_state = gr.State([])
-            current_scene_idx = gr.State(0)
+            load_scenes_btn = gr.Button("Load Scenes", variant="secondary")
             
-            gr.Markdown("### 2. Production Board")
-            with gr.Row():
-                with gr.Column(scale=1):
-                    scene_list = gr.Dropdown(label="Select Scene", choices=[], interactive=True)
-                    scene_text = gr.Textbox(label="Scene Text", lines=3, interactive=False)
-                    scene_mood = gr.Textbox(label="Mood & Pacing", interactive=False)
-                    scene_prompt = gr.TextArea(label="Visual Prompt (Copy this!)", lines=3, interactive=False)
-                    copy_prompt_btn = gr.Button("📋 Copy Prompt")
+            scene_editor_container = gr.Column(visible=False)
+            with scene_editor_container:
+                scenes_state = gr.State([])
+                current_scene_idx = gr.State(0)
+                current_json_path = gr.State()
                 
-                with gr.Column(scale=1):
-                    scene_image = gr.Image(label="Scene Image", type="filepath", sources=["upload"], interactive=True)
-                    save_image_btn = gr.Button("Save Image to Scene", variant="primary")
-                    scene_status = gr.Textbox(label="Status", interactive=False)
-            
+                gr.Markdown("### 2. Production Board")
+                with gr.Row():
+                    with gr.Column(scale=1):
+                        scene_list = gr.Dropdown(label="Select Scene", choices=[], interactive=True)
+                        scene_text = gr.Textbox(label="Scene Text", lines=3, interactive=False)
+                        scene_mood = gr.Textbox(label="Mood & Pacing", interactive=False)
+                        scene_prompt = gr.TextArea(label="Visual Prompt (Copy this!)", lines=3, interactive=False)
+                        copy_prompt_btn = gr.Button("📋 Copy Prompt")
+                    
+                    with gr.Column(scale=1):
+                        scene_image = gr.Image(label="Scene Image", type="filepath", sources=["upload"], interactive=True)
+                        save_image_btn = gr.Button("Save Image to Scene", variant="primary")
+                        scene_status = gr.Textbox(label="Status", interactive=False)
+                        download_json_btn = gr.DownloadButton("Download Updated JSON", label="Download JSON")
+
             # Helper functions
-            def load_scenes(file):
-                if not file:
-                    return [], gr.update(choices=[]), "Please upload a JSON file."
-                
+            def load_scenes(file, text_input):
+                json_path = None
+
+                if file:
+                    json_path = file.name
+                elif text_input:
+                    # Save pasted text to a temp file
+                    try:
+                        import json
+                        # Validate JSON first
+                        data = json.loads(text_input)
+
+                        # Save to a file so we can update it later
+                        output_dir = Path("chapter_drafts")
+                        output_dir.mkdir(exist_ok=True)
+                        json_path = output_dir / "pasted_scenes.json"
+
+                        with open(json_path, 'w') as f:
+                            json.dump(data, f, indent=2)
+                        json_path = str(json_path)
+                    except Exception as e:
+                        return [], 0, gr.update(choices=[]), "", "", "", None, f"Invalid JSON: {e}", gr.update(visible=False), None
+
+                if not json_path:
+                    return [], 0, gr.update(choices=[]), "", "", "", None, "Please upload a file or paste JSON.", gr.update(visible=False), None
+
                 try:
                     import json
-                    with open(file.name, 'r') as f:
+                    with open(json_path, 'r') as f:
                         data = json.load(f)
-                    
+
                     scenes = data.get("scenes", [])
-                    choices = [f"Scene {s.get('id', i+1)}: {s.get('text_segment', '')[:30]}..." for i, s in enumerate(scenes)]
-                    return scenes, gr.update(choices=choices, value=choices[0] if choices else None), f"Loaded {len(scenes)} scenes."
+                    if not scenes:
+                        return [], 0, gr.update(choices=[]), "", "", "", None, "No scenes found in JSON.", gr.update(visible=False), None
+
+                    # Prepare dropdown choices
+                    choices = [f"Scene {s.get('id')}: {s.get('text_segment')[:30]}..." for s in scenes]
+
+                    # Load first scene
+                    first_scene = scenes[0]
+
+                    return (
+                        scenes, # state
+                        0, # idx
+                        gr.update(choices=choices, value=choices[0]), # dropdown
+                        first_scene.get("text_segment", ""),
+                        f"Mood: {first_scene.get('mood')} | Pacing: {first_scene.get('pacing')}",
+                        first_scene.get("visual_prompt", ""),
+                        first_scene.get("image_path"), # Image
+                        f"Loaded {len(scenes)} scenes from {os.path.basename(json_path)}",
+                        gr.update(visible=True), # Show editor
+                        json_path # Update current_json_path state
+                    )
                 except Exception as e:
-                    return [], gr.update(choices=[]), f"Error: {e}"
+                    return [], 0, gr.update(choices=[]), "", "", "", None, f"Error loading JSON: {e}", gr.update(visible=False), None
 
             def select_scene(evt: gr.SelectData, scenes):
                 # This might be tricky with dropdown, let's use index
@@ -510,7 +586,7 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             def update_scene_view(selected_label, scenes):
                 if not selected_label or not scenes:
                     return "", "", "", None, 0
-                
+
                 # Find index
                 idx = 0
                 for i, s in enumerate(scenes):
@@ -518,17 +594,17 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     if label == selected_label:
                         idx = i
                         break
-                
+
                 scene = scenes[idx]
                 text = scene.get("text_segment", "")
                 mood = f"Mood: {scene.get('mood', 'N/A')} | Pacing: {scene.get('pacing', 'N/A')}"
                 prompt = scene.get("visual_prompt", "")
                 img_path = scene.get("image_path", None)
-                
+
                 return text, mood, prompt, img_path, idx
 
-            def save_scene_image(img, idx, scenes, json_file):
-                if not json_file:
+            def save_scene_image(img, idx, scenes, json_path):
+                if not json_path:
                     return scenes, "No JSON file loaded."
                 
                 if img is None:
@@ -538,23 +614,25 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                 scenes[idx]["image_path"] = img
                 
                 # Save back to JSON file
-                # We need to read the full original JSON to preserve other fields
                 import json
-                with open(json_file.name, 'r') as f:
-                    full_data = json.load(f)
-                
-                full_data["scenes"] = scenes
-                
-                with open(json_file.name, 'w') as f:
-                    json.dump(full_data, f, indent=2)
-                
-                return scenes, f"Saved image for Scene {idx+1}"
+                try:
+                    with open(json_path, 'r') as f:
+                        full_data = json.load(f)
+                    
+                    full_data["scenes"] = scenes
+                    
+                    with open(json_path, 'w') as f:
+                        json.dump(full_data, f, indent=2)
+                    
+                    return scenes, f"Saved image for Scene {idx+1}"
+                except Exception as e:
+                    return scenes, f"Error saving: {e}"
 
             # Events
             load_scenes_btn.click(
                 load_scenes,
-                inputs=[scene_json_file],
-                outputs=[scenes_state, scene_list, scene_status]
+                inputs=[scene_json_file, scene_json_text],
+                outputs=[scenes_state, current_scene_idx, scene_list, scene_text, scene_mood, scene_prompt, scene_image, scene_status, scene_editor_container, current_json_path]
             )
             
             scene_list.change(
@@ -565,11 +643,59 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             
             save_image_btn.click(
                 save_scene_image,
-                inputs=[scene_image, current_scene_idx, scenes_state, scene_json_file],
+                inputs=[scene_image, current_scene_idx, scenes_state, current_json_path],
                 outputs=[scenes_state, scene_status]
             )
+            
+            # Download Logic
+            download_json_btn.click(
+                lambda path: path,
+                inputs=[current_json_path],
+                outputs=[download_json_btn]
+            )
+            
+            # Copy Prompt Logic
+            copy_prompt_btn.click(
+                None,
+                inputs=[scene_prompt],
+                outputs=None,
+                js="(text) => { navigator.clipboard.writeText(text); return text; }"
+            )
 
-        # Tab 4: Manage Voices
+        # Tab 4: Video Assembly (The Studio)
+        with gr.Tab("Render Video"):
+            gr.Markdown("### 4. Assemble Movie")
+            gr.Markdown("Turn your Direction Sheet + Images into a final video.")
+            
+            with gr.Row():
+                render_json_file = gr.File(label="Upload Completed Direction Sheet (JSON)", file_types=[".json"])
+                voice_for_video = gr.Dropdown(label="Narrator Voice", choices=[v['name'] for v in voice_manager.list_voices()], value="af_bella")
+            
+            render_btn = gr.Button("🎥 Render Full Movie", variant="primary")
+            video_output = gr.Video(label="Final Movie")
+            render_status = gr.Textbox(label="Status", interactive=False)
+            
+            def render_movie(json_file, voice):
+                if not json_file:
+                    return None, "Please upload a JSON file first."
+                
+                try:
+                    from video_editor import VideoEditor
+                    editor = VideoEditor()
+                    
+                    # Update status
+                    output_path = editor.assemble_video(json_file.name, voice_name=voice)
+                    return output_path, "Render Complete!"
+                except Exception as e:
+                    return None, f"Error: {str(e)}"
+
+            render_btn.click(
+                render_movie,
+                inputs=[render_json_file, voice_for_video],
+                outputs=[video_output, render_status]
+            )
+
+        # Tab 5: Manage Voices
             gr.Markdown("### Save New Voice")
             with gr.Row():
                 with gr.Column():

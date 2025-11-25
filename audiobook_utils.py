@@ -17,20 +17,11 @@ from docx import Document
 class DocumentParser:
     """Parse documents and extract clean text for TTS processing."""
     
-    def __init__(self, use_llm_cleanup: bool = False):
+    def __init__(self):
         """
         Initialize the document parser.
-        
-        Args:
-            use_llm_cleanup: If True, use SLM for intelligent text cleanup (slower but higher quality)
         """
-        self.supported_formats = ['.pdf', '.doc', '.docx']
-        self.use_llm_cleanup = use_llm_cleanup
-        self.enhancer = None
-        
-        if use_llm_cleanup:
-            from text_enhancer import TextEnhancer
-            self.enhancer = TextEnhancer()
+        self.supported_formats = ['.pdf', '.doc', '.docx', '.txt']
     
     def parse_document(self, file_path: str) -> Tuple[str, dict]:
         """
@@ -65,16 +56,13 @@ class DocumentParser:
             text, page_count = self._parse_pdf(path)
         elif extension in ['.doc', '.docx']:
             text, page_count = self._parse_docx(path)
+        elif extension == '.txt':
+            text, page_count = self._parse_txt(path)
         else:
             raise ValueError(f"Unsupported format: {extension}")
         
-        # Clean the text (Tier 1: regex-based)
+        # Clean the text (Regex-based)
         text = self._clean_text(text)
-        
-        # Tier 2: SLM-powered cleanup (optional)
-        if self.use_llm_cleanup and self.enhancer:
-            print("Applying AI text cleanup...")
-            text = self.enhancer.clean_text_with_llm(text)
         
         # Generate metadata
         metadata = {
@@ -117,20 +105,42 @@ class DocumentParser:
             path: Path to DOCX file
             
         Returns:
-            Tuple of (text, estimated_page_count)
+            Tuple of (text, page_count)
         """
         doc = Document(path)
         text_parts = []
         
         for paragraph in doc.paragraphs:
-            if paragraph.text.strip():
+            if paragraph.text:
                 text_parts.append(paragraph.text)
+                
+        # Estimate page count (approx 500 words per page)
+        text = '\n\n'.join(text_parts)
+        word_count = len(text.split())
+        page_count = max(1, word_count // 500)
         
-        full_text = '\n\n'.join(text_parts)
+        return text, page_count
+
+    def _parse_txt(self, path: Path) -> Tuple[str, int]:
+        """
+        Extract text from TXT file.
         
-        # Estimate page count (roughly 500 words per page)
-        word_count = len(full_text.split())
-        estimated_pages = max(1, word_count // 500)
+        Args:
+            path: Path to TXT file
+            
+        Returns:
+            Tuple of (text, page_count)
+        """
+        with open(path, 'r', encoding='utf-8') as f:
+            text = f.read()
+            
+        # Estimate page count (approx 500 words per page)
+        word_count = len(text.split())
+        page_count = max(1, word_count // 500)
+        
+        return text, page_count
+        
+
         
         return full_text, estimated_pages
     
