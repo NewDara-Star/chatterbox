@@ -22,7 +22,15 @@ def test_generator():
     output_wav = "test_audiobook.wav"
     
     # Create sample files
-    create_sample_pdf(input_pdf)
+    # Create sample PDF with SFX keywords
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+    c = canvas.Canvas(input_pdf, pagesize=letter)
+    c.drawString(100, 750, "Chapter 1: The Spooky House")
+    c.drawString(100, 700, "The door creaked open slowly.")
+    c.drawString(100, 680, "Rain fell heavily against the window pane.")
+    c.save()
+    
     create_dummy_wav(voice_file)
     
     # Setup voice manager
@@ -39,7 +47,7 @@ def test_generator():
         print("✓ Generator initialized")
         
         # Test generation
-        print("\n🎧 Generating audiobook...")
+        print("\n🎧 Generating audiobook with SFX...")
         
         def progress_callback(p, msg):
             print(f"  [{int(p*100)}%] {msg}")
@@ -48,7 +56,8 @@ def test_generator():
             input_path=input_pdf,
             output_path=output_wav,
             voice_name="TestNarrator",
-            progress_callback=progress_callback
+            progress_callback=progress_callback,
+            detect_sfx=True  # Enable SFX detection
         )
         
         if os.path.exists(output_path):

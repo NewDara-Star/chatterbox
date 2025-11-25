@@ -46,8 +46,18 @@ checkpoints/
 
 # Virtual environment
 venv/
+venv_sfx/
 env/
 
 # Ignore generated sample .wav files
 **/*.wav
 test-*.wav
+
+# Temp files
+sfx_suggestions.json
+temp_chunks/
+test_book.pdf
+test_ai_cleanup.pdf
+
+# User content
+voices/*.wav

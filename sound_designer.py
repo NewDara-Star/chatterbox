@@ -1,56 +1,100 @@
 """
-Sound Designer - AI-Powered Sound Effects Generation and Mixing
+Sound Designer - AI-Powered Sound Effects Generation
 
-This module uses Bark to generate sound effects from text prompts
-and mixes them into audiobooks at contextually appropriate timestamps.
+This module uses Meta's AudioGen (via AudioCraft) to generate high-quality
+sound effects from text prompts. It runs AudioGen in an isolated virtual
+environment (venv_sfx) to avoid dependency conflicts.
 
-Optimized for Apple Silicon (M4) with MPS acceleration.
+Falls back to procedural generation if the isolated environment is missing
+or generation fails.
 """
 
 import json
-import torch
 import numpy as np
 import soundfile as sf
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
-from bark import SAMPLE_RATE, generate_audio, preload_models
+from typing import List, Dict, Optional
 from scipy.signal import resample
-
+import subprocess
+import os
+import tempfile
 
 class SoundDesigner:
-    """Generate and mix sound effects for audiobooks."""
+    """Mix sound effects into audiobooks."""
     
-    def __init__(self, device: str = None):
-        """
-        Initialize the sound designer.
+    def __init__(self):
+        """Initialize the sound designer."""
+        self.sample_rate = 24000  # Standard sample rate for audiobook
         
-        Args:
-            device: Device to use (cuda, mps, cpu). Auto-detected if None.
-        """
-        if device is None:
-            if torch.cuda.is_available():
-                device = "cuda"
-            elif torch.backends.mps.is_available():
-                device = "mps"
-            else:
-                device = "cpu"
+        # Path to isolated python
+        self.venv_python = Path("venv_sfx/bin/python").resolve()
+        self.cli_script = Path("generate_sfx_cli.py").resolve()
         
-        self.device = device
-        self._loaded = False
-        self.sample_rate = SAMPLE_RATE  # Bark's sample rate (24kHz)
+        # Built-in simple SFX (fallback)
+        self.sfx_generators = {
+            'rain': self._generate_rain,
+            'thunder': self._generate_thunder,
+            'door': self._generate_door_creak,
+            'footsteps': self._generate_footsteps,
+            'wind': self._generate_wind,
+        }
     
-    def _load_models(self):
-        """Lazy-load Bark models."""
-        if self._loaded:
-            return
+    def _generate_rain(self, duration: float = 5.0) -> np.ndarray:
+        """Generate rain sound using white noise."""
+        samples = int(duration * self.sample_rate)
+        # White noise filtered to sound like rain
+        rain = np.random.normal(0, 0.1, samples)
+        # Apply envelope for natural fade
+        envelope = np.linspace(0.5, 1.0, samples)
+        return rain * envelope
+    
+    def _generate_thunder(self, duration: float = 3.0) -> np.ndarray:
+        """Generate thunder sound using low-frequency rumble."""
+        samples = int(duration * self.sample_rate)
+        t = np.linspace(0, duration, samples)
+        # Low frequency rumble
+        thunder = np.sin(2 * np.pi * 40 * t) * np.exp(-t/2)
+        thunder += np.random.normal(0, 0.05, samples)
+        return thunder * 0.5
+    
+    def _generate_door_creak(self, duration: float = 2.0) -> np.ndarray:
+        """Generate door creaking sound."""
+        samples = int(duration * self.sample_rate)
+        t = np.linspace(0, duration, samples)
+        # Creaking sound (frequency sweep)
+        freq_sweep = 200 + 100 * np.sin(2 * np.pi * 2 * t)
+        creak = np.sin(2 * np.pi * freq_sweep * t)
+        envelope = np.exp(-t/duration * 2)
+        return creak * envelope * 0.3
+    
+    def _generate_footsteps(self, duration: float = 3.0) -> np.ndarray:
+        """Generate footsteps sound."""
+        samples = int(duration * self.sample_rate)
+        # Create individual footstep sounds
+        step_duration = 0.3  # seconds per step
+        num_steps = int(duration / step_duration)
+        footsteps = np.zeros(samples)
         
-        print(f"Loading Bark models...")
+        for i in range(num_steps):
+            step_start = int(i * step_duration * self.sample_rate)
+            step_samples = int(0.2 * self.sample_rate)
+            t = np.linspace(0, 0.2, step_samples)
+            # Thud sound
+            step = np.sin(2 * np.pi * 100 * t) * np.exp(-t * 20)
+            step += np.random.normal(0, 0.02, step_samples)
+            footsteps[step_start:step_start+step_samples] = step * 0.4
         
-        # Preload Bark models (downloads on first use)
-        preload_models()
-        
-        self._loaded = True
-        print("Bark models loaded successfully!")
+        return footsteps
+    
+    def _generate_wind(self, duration: float = 5.0) -> np.ndarray:
+        """Generate wind sound."""
+        samples = int(duration * self.sample_rate)
+        # Low-frequency noise for wind
+        wind = np.random.normal(0, 0.08, samples)
+        # Apply slow modulation
+        t = np.linspace(0, duration, samples)
+        modulation = 0.5 + 0.5 * np.sin(2 * np.pi * 0.5 * t)
+        return wind * modulation
     
     def generate_sfx(
         self,
@@ -62,32 +106,86 @@ class SoundDesigner:
         
         Args:
             prompt: Text description of the sound effect
-            duration: Target duration in seconds (Bark will generate ~5-10s)
+            duration: Target duration in seconds
             
         Returns:
             Audio waveform as numpy array
         """
-        self._load_models()
+        # Try AI generation via isolated environment
+        if self.venv_python.exists() and self.cli_script.exists():
+            print(f"Generating AI SFX: '{prompt}' (via AudioGen)")
+            
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                temp_wav = tmp.name
+                
+            try:
+                # Call the wrapper script
+                cmd = [
+                    str(Path("run_sfx.sh").resolve()),
+                    "--prompt", prompt,
+                    "--duration", str(duration),
+                    "--output", temp_wav
+                ]
+                
+                # Prepare environment (clear PYTHONPATH to avoid conflicts)
+                env = os.environ.copy()
+                # Clear variables that might confuse the subprocess python
+                for var in ["PYTHONPATH", "PYTHONHOME", "__PYVENV_LAUNCHER__"]:
+                    if var in env:
+                        del env[var]
+                
+                result = subprocess.run(
+                    cmd, 
+                    capture_output=True, 
+                    text=True,
+                    check=True,
+                    env=env
+                )
+                
+                # Read the generated audio
+                if os.path.exists(temp_wav):
+                    audio, sr = sf.read(temp_wav)
+                    
+                    # Resample if needed (AudioGen is usually 16k or 32k)
+                    if sr != self.sample_rate:
+                        target_samples = int(len(audio) * self.sample_rate / sr)
+                        audio = resample(audio, target_samples)
+                        
+                    # Cleanup
+                    os.unlink(temp_wav)
+                    return audio
+                    
+            except subprocess.CalledProcessError as e:
+                print(f"AI Generation failed: {e.stderr}")
+                print("Switching to procedural fallback.")
+            except Exception as e:
+                print(f"Error reading AI audio: {e}")
+                if os.path.exists(temp_wav):
+                    os.unlink(temp_wav)
+        else:
+            print("AudioGen environment not found. Using procedural fallback.")
         
-        print(f"Generating SFX: '{prompt}'")
+        # Fallback to procedural
+        print(f"Generating Procedural SFX: '{prompt}'")
         
-        # Bark uses special prompts for non-speech sounds
-        # Add sound effect markers
-        bark_prompt = f"[sound effect: {prompt}]"
+        # Match keywords to generators
+        prompt_lower = prompt.lower()
         
-        # Generate audio
-        audio = generate_audio(bark_prompt)
-        
-        # Trim or pad to target duration
-        target_samples = int(duration * self.sample_rate)
-        if len(audio) > target_samples:
-            # Trim
-            audio = audio[:target_samples]
-        elif len(audio) < target_samples:
-            # Pad with silence
-            audio = np.pad(audio, (0, target_samples - len(audio)))
-        
-        return audio
+        if 'rain' in prompt_lower:
+            return self._generate_rain(duration)
+        elif 'thunder' in prompt_lower or 'rumbl' in prompt_lower:
+            return self._generate_thunder(duration)
+        elif 'door' in prompt_lower or 'creak' in prompt_lower:
+            return self._generate_door_creak(duration)
+        elif 'footstep' in prompt_lower or 'step' in prompt_lower or 'walk' in prompt_lower:
+            return self._generate_footsteps(duration)
+        elif 'wind' in prompt_lower:
+            return self._generate_wind(duration)
+        else:
+            # Default: gentle ambient noise
+            print(f"  No specific generator for '{prompt}', using ambient noise")
+            samples = int(duration * self.sample_rate)
+            return np.random.normal(0, 0.05, samples)
     
     def map_sfx_to_timestamps(
         self,

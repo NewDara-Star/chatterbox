@@ -122,73 +122,123 @@ Cleaned text:"""
         
         return cleaned
     
-    def detect_sound_effects(self, text: str, max_effects: int = 10) -> List[Dict[str, str]]:
+    def analyze_scene(self, text: str) -> Dict:
         """
-        Analyze text and suggest sound effects.
+        Analyze text for mood, ambience, and sound effects.
         
         Args:
             text: Text to analyze
-            max_effects: Maximum number of effects to suggest
             
         Returns:
-            List of dicts with keys: 'timestamp', 'effect', 'description'
+            Dict containing:
+            - mood: str
+            - intensity: int (1-10)
+            - ambience: List[str]
+            - sfx: List[Dict]
         """
         self._load_model()
         
-        # Simpler prompt with explicit format
-        prompt = f"""Analyze this text and suggest sound effects for an audiobook.
+        prompt = f"""You are an expert sound engineer for audiobooks.
 
-Text: "{text[:800]}"
+Task: Analyze the text below for mood, ambience, and sound effects.
 
-List 3-5 sound effects that would enhance this scene. For each effect, provide:
-1. When it should play (start/middle/end)
-2. A brief name (e.g., "door creaking")
-3. A detailed description for audio generation
+Output Format (JSON):
+{{
+  "mood": "Dominant mood (e.g. Suspenseful, Joyful)",
+  "intensity": 1-10,
+  "ambience": ["continuous background sound 1", "continuous background sound 2"],
+  "sfx": [
+    {{"timestamp": "start/middle/end", "name": "short name", "description": "detailed audio prompt"}}
+  ]
+}}
 
-Format your response EXACTLY like this example:
-start | door creaking | old wooden door slowly opening with rusty hinges
-middle | rain sounds | gentle rain pattering on window glass
-end | footsteps | slow footsteps on wooden floorboards
+Example (for a sunny park scene):
+{{
+  "mood": "Joyful",
+  "intensity": 3,
+  "ambience": ["birds chirping", "distant laughter"],
+  "sfx": [
+    {{"timestamp": "middle", "name": "bicycle bell", "description": "cheerful bicycle bell ringing twice"}}
+  ]
+}}
 
-Your response:"""
+Now analyze THIS text (it is NOT a sunny park):
+Text: "{text[:1000]}"
+
+Your JSON analysis:"""
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=300,
-                temperature=0.5,
+                max_new_tokens=500,
+                temperature=0.7,
                 do_sample=True,
                 pad_token_id=self.tokenizer.eos_token_id
             )
         
         result = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Extract the response after "Your response:"
-        if "Your response:" in result:
-            response_text = result.split("Your response:")[-1].strip()
-        else:
-            response_text = result.strip()
+        # Strip prompt
+        if "Your JSON analysis:" in result:
+            result = result.split("Your JSON analysis:")[-1]
         
-        # Parse line-by-line format
-        effects = []
-        lines = response_text.split('\n')
-        
-        for line in lines[:max_effects]:
-            line = line.strip()
-            if not line or '|' not in line:
-                continue
+        # Extract JSON with brace counting
+        try:
+            start = result.find('{')
+            if start != -1:
+                brace_count = 0
+                json_str = ""
+                found_end = False
                 
-            parts = [p.strip() for p in line.split('|')]
-            if len(parts) >= 3:
-                effects.append({
-                    'timestamp': parts[0],
-                    'effect': parts[1],
-                    'description': parts[2]
-                })
+                for i, char in enumerate(result[start:]):
+                    if char == '{':
+                        brace_count += 1
+                    elif char == '}':
+                        brace_count -= 1
+                    
+                    if brace_count == 0:
+                        json_str = result[start:start+i+1]
+                        found_end = True
+                        break
+                
+                if found_end:
+                    data = json.loads(json_str)
+                    return data
+        except Exception as e:
+            print(f"Error parsing JSON from LLM: {e}")
+            print(f"Raw LLM Output: {result}")
+            # Fallback
+            return {
+                "mood": "Neutral",
+                "intensity": 5,
+                "ambience": [],
+                "sfx": []
+            }
         
-        return effects
+        return {
+            "mood": "Neutral",
+            "intensity": 5,
+            "ambience": [],
+            "sfx": []
+        }
+
+    def detect_sound_effects(self, text: str, max_effects: int = 10) -> List[Dict[str, str]]:
+        """Legacy wrapper for backward compatibility."""
+        scene_data = self.analyze_scene(text)
+        effects = scene_data.get("sfx", [])
+        
+        # Normalize format if needed
+        normalized = []
+        for effect in effects[:max_effects]:
+            normalized.append({
+                "timestamp": effect.get("timestamp", "middle"),
+                "effect": effect.get("name", "unknown"),
+                "description": effect.get("description", "")
+            })
+            
+        return normalized
 
 
 if __name__ == "__main__":

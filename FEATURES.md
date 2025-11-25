@@ -228,6 +228,43 @@ A user-friendly web interface for the audiobook converter, built with Gradio. It
 
 **Key Components**:
 
+## Feature 6: Background Job Manager
+
+**Status**: ✅ Completed  
+**Date**: 2025-11-24
+
+### Overview
+
+Decouples the audiobook generation process from the web UI session. This ensures that long-running generation jobs continue even if the browser tab is closed or refreshed.
+
+### Implementation Details
+
+**File**: `gradio_audiobook_app.py`
+
+**Key Components**:
+
+1. **JobManager Class**
+   - Singleton instance managing global job state
+   - Thread-safe status updates (IDLE, RUNNING, COMPLETED, FAILED)
+   - Stores progress percentage and status messages
+
+2. **Background Threading**
+   - Generation runs in a daemon thread
+   - Independent of the HTTP request/response cycle
+
+3. **UI Polling**
+   - Uses `gr.Timer` to poll `JobManager` every second
+   - Updates status text and progress automatically
+   - Auto-shows result audio player upon completion
+
+### Benefits
+
+- **Resilience**: accidental page refreshes don't kill the job
+- **Multi-tab Support**: check progress from multiple tabs (shared state)
+- **Responsiveness**: UI remains responsive while generating
+
+---
+
 1. **Document Analysis Tab**
    - Drag-and-drop upload for PDF and DOCX
    - Instant analysis of page count, word count, and character count

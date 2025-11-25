@@ -292,9 +292,9 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                 )
                 
                 detect_sfx = gr.Checkbox(
-                    label="Detect and suggest sound effects",
+                    label="Generate and mix sound effects (Experimental)",
                     value=False,
-                    info="Saves suggestions to sfx_suggestions.json for review"
+                    info="Analyzes text for scene context and mixes in sound effects (rain, thunder, footsteps, etc.)"
                 )
 
             # Step 3: Generate

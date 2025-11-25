@@ -261,45 +261,92 @@ class AudiobookGenerator:
             raise RuntimeError("No audio generated")
             
         # Combine from files
-        full_audio_segments = []
+        audio_segments = [] # Renamed from full_audio_segments to avoid conflict with user's change
         silence = np.zeros(int(self.model.sr * 0.5))
         
         for _, fpath in chunk_files:
             data, _ = sf.read(fpath)
-            full_audio_segments.append(data)
-            full_audio_segments.append(silence)
+            audio_segments.append(data)
+            audio_segments.append(silence)
             
-        full_audio = np.concatenate(full_audio_segments)
+        combined_audio = np.concatenate(audio_segments)
         
         # Cleanup temp files
         import shutil
         shutil.rmtree(temp_dir, ignore_errors=True)
         
-        # Normalize audio to -3dB to ensure consistent volume
-        max_val = np.abs(full_audio).max()
+        # Normalize
+        max_val = np.abs(combined_audio).max()
         if max_val > 0:
-            target_db = -3.0
-            target_amp = 10 ** (target_db / 20)
-            gain = target_amp / max_val
-            full_audio = full_audio * gain
-            print(f"Normalized audio (gain: {gain:.2f}x)")
-        
-        # 5. Save Output
-        if progress_callback:
-            progress_callback(0.95, "Saving output file...")
+            combined_audio = combined_audio / max_val * 0.95
             
-        print(f"Saving to {output_path}")
-        # Convert back to tensor for saving
-        full_audio_tensor = torch.from_numpy(full_audio).unsqueeze(0)
-        torchaudio.save(output_path, full_audio_tensor, self.model.sr)
+        print(f"Normalized audio (gain: {0.95/max_val:.2f}x)")
         
-        elapsed = time.time() - start_time
-        print(f"Audiobook generated in {elapsed:.1f}s")
+        # Save raw narration first
+        narration_path = output_path.replace(".wav", "_narration.wav")
+        sf.write(narration_path, combined_audio, self.model.sr)
+        
+        # 6. Generate and Mix SFX (if enabled)
+        final_output_path = output_path
+        
+        if detect_sfx and Path("sfx_suggestions.json").exists():
+            if progress_callback:
+                progress_callback(0.98, "Generating and mixing sound effects...")
+            
+            print("Mixing sound effects...")
+            try:
+                import json
+                from sound_designer import SoundDesigner
+                
+                # Load suggestions
+                with open("sfx_suggestions.json", 'r') as f:
+                    sfx_suggestions = json.load(f)
+                
+                if sfx_suggestions:
+                    designer = SoundDesigner()
+                    
+                    # Calculate total duration
+                    duration = len(combined_audio) / self.model.sr
+                    
+                    # Map timestamps
+                    mapped_sfx = designer.map_sfx_to_timestamps(sfx_suggestions, text, duration)
+                    
+                    # Mix
+                    final_output_path = designer.mix_audio(
+                        narration_path=narration_path,
+                        sfx_list=mapped_sfx,
+                        output_path=output_path,
+                        sfx_volume=0.3
+                    )
+                    print(f"Mixed audio saved to {final_output_path}")
+                else:
+                    print("No SFX suggestions found to mix.")
+                    # If no SFX, just rename narration to output
+                    import shutil
+                    shutil.copy(narration_path, output_path)
+                    
+            except Exception as e:
+                print(f"Error mixing SFX: {e}")
+                print("Falling back to narration only.")
+                import shutil
+                shutil.copy(narration_path, output_path)
+        # 5. Save Output (if not already saved by SFX mixer)
+        if not detect_sfx or not Path("sfx_suggestions.json").exists():
+            if progress_callback:
+                progress_callback(0.95, "Saving output file...")
+                
+            print(f"Saving to {output_path}")
+            # Convert back to tensor for saving
+            final_audio_tensor = torch.from_numpy(combined_audio).unsqueeze(0)
+            torchaudio.save(output_path, final_audio_tensor, self.model.sr)
+        
+        total_time = time.time() - start_time
+        print(f"Audiobook generated in {total_time:.1f}s")
         
         if progress_callback:
             progress_callback(1.0, "Done!")
             
-        return output_path
+        return final_output_path
 
 
 if __name__ == "__main__":

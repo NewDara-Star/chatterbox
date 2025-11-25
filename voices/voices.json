@@ -1,0 +1,30 @@
+{
+  "Daramola": {
+    "filename": "daramola.m4a",
+    "description": "My speaking voice",
+    "created_at": "2025-11-24T21:20:25.416807",
+    "file_size": 653316,
+    "format": "m4a"
+  },
+  "young British Woman": {
+    "filename": "young_british_woman.wav",
+    "description": "young british woman in her mid 20s or 30s",
+    "created_at": "2025-11-24T21:22:03.021743",
+    "file_size": 10305542,
+    "format": "wav"
+  },
+  "TIFO": {
+    "filename": "tifo.wav",
+    "description": "TIFO VOICE",
+    "created_at": "2025-11-24T21:47:41.443405",
+    "file_size": 13603892,
+    "format": "wav"
+  },
+  "SLEEPY OLD MAN VOICE": {
+    "filename": "sleepy_old_man_voice.wav",
+    "description": "SLEEPY OLD MAN VOICE",
+    "created_at": "2025-11-24T21:51:17.189302",
+    "file_size": 40055340,
+    "format": "wav"
+  }
+}
