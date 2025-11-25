@@ -10,7 +10,44 @@ from moviepy import (
 )
 
 
+
+
 from audiobook_generator import AudiobookGenerator
+
+
+class EasingFunctions:
+    """
+    Easing functions for smooth video transitions.
+    Based on research: cubic ease-in-out produces most natural-looking transitions.
+    """
+    
+    @staticmethod
+    def ease_in_out_cubic(t):
+        """
+        Cubic ease-in-out (smooth start and end).
+        Perfect for crossfades and opacity changes.
+        """
+        if t < 0.5:
+            return 4 * t * t * t
+        else:
+            p = 2 * t - 2
+            return 0.5 * p * p * p + 1
+    
+    @staticmethod
+    def ease_in_quad(t):
+        """Quadratic ease-in (slow start, accelerating)."""
+        return t * t
+    
+    @staticmethod
+    def ease_out_quad(t):
+        """Quadratic ease-out (fast start, decelerating)."""
+        return t * (2 - t)
+    
+    @staticmethod
+    def linear(t):
+        """Linear (no easing)."""
+        return t
+
 
 class VideoEditor:
     """
