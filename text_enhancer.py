@@ -86,28 +86,33 @@ class TextEnhancer:
     
     def _clean_chunk(self, text: str) -> str:
         """Clean a single chunk of text."""
-        prompt = f"""You are a text cleaning assistant for audiobook production.
+        prompt = f"""You are a strict text cleaning tool.
 
-Task: Clean the following text extracted from a PDF. Remove:
-- Headers and footers (page numbers, chapter titles at top/bottom)
-- Copyright notices
-- Image captions and figure labels
-- OCR errors and artifacts
+Task: Remove headers, footers, page numbers, and artifacts from the text below.
+Constraint: Output ONLY the cleaned text. Do NOT add any introductory or concluding remarks.
 
-Keep all narrative content intact. Output ONLY the cleaned text, no explanations.
+Example Input:
+Page 12
+The night was dark.
+Chapter 4
+The wind howled.
 
-Text:
+Example Output:
+The night was dark.
+The wind howled.
+
+Input Text:
 {text}
 
-Cleaned text:"""
+Cleaned Text:"""
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=len(text) + 100,  # Allow some expansion
-                temperature=0.3,  # Low temp for deterministic cleaning
+                max_new_tokens=len(text) + 100,
+                temperature=0.1,  # Lower temp for more deterministic behavior
                 do_sample=True,
                 pad_token_id=self.tokenizer.eos_token_id
             )
@@ -115,10 +120,14 @@ Cleaned text:"""
         result = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         # Extract only the cleaned text (after the prompt)
-        if "Cleaned text:" in result:
-            cleaned = result.split("Cleaned text:")[-1].strip()
+        # Use the exact string from the prompt end
+        split_marker = "Cleaned Text:"
+        if split_marker in result:
+            cleaned = result.split(split_marker)[-1].strip()
         else:
-            cleaned = result.strip()
+            # Fallback: try to find where the prompt ends if exact match fails
+            # (Unlikely with deterministic generation but good safety)
+            cleaned = result.replace(prompt, "").strip()
         
         return cleaned
     

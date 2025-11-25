@@ -216,6 +216,96 @@ class DocumentParser:
         
         return text
     
+    def split_into_chapters(self, text: str, max_chars: int = 30000) -> List[Tuple[str, str]]:
+        """
+        Split text into chapters based on common headings.
+        Enforces a maximum character limit per chapter by splitting into parts if needed.
+        
+        Args:
+            text: Full text
+            max_chars: Maximum characters per chapter (default: 30000)
+            
+        Returns:
+            List of (chapter_title, chapter_text) tuples
+        """
+        # Common chapter patterns
+        # 1. "Chapter 1", "Chapter One", "CHAPTER 1"
+        # 2. "Prologue", "Epilogue"
+        # 3. "Part 1", "Book One"
+        chapter_pattern = re.compile(
+            r'\n\s*(?:Chapter|Part|Book)\s+(?:\d+|[IVXLCDM]+|[A-Za-z]+).*?\n|'
+            r'\n\s*(?:Prologue|Epilogue|Introduction|Preface).*?\n',
+            re.IGNORECASE
+        )
+        
+        matches = list(chapter_pattern.finditer(text))
+        
+        raw_chapters = []
+        
+        if not matches:
+            # No clear chapters found, treat as single block
+            raw_chapters.append(("Full Text", text))
+        else:
+            # Handle text before first chapter (e.g. title page, dedication)
+            if matches[0].start() > 0:
+                preamble = text[:matches[0].start()].strip()
+                if preamble:
+                    raw_chapters.append(("Preamble", preamble))
+            
+            # Extract chapters
+            for i, match in enumerate(matches):
+                title = match.group().strip()
+                start = match.end()
+                
+                if i < len(matches) - 1:
+                    end = matches[i+1].start()
+                else:
+                    end = len(text)
+                    
+                content = text[start:end].strip()
+                if content:
+                    raw_chapters.append((title, content))
+        
+        # Post-process to enforce max_chars
+        final_chapters = []
+        for title, content in raw_chapters:
+            if len(content) <= max_chars:
+                final_chapters.append((title, content))
+            else:
+                # Split large chapter
+                parts = self._split_large_content(content, max_chars)
+                for i, part in enumerate(parts, 1):
+                    final_chapters.append((f"{title} (Part {i})", part))
+                    
+        return final_chapters
+
+    def _split_large_content(self, content: str, max_chars: int) -> List[str]:
+        """Helper to split large content at paragraph boundaries."""
+        parts = []
+        while len(content) > max_chars:
+            # Find split point (last double newline before max_chars)
+            # Try to split at paragraph break
+            split_idx = content.rfind('\n\n', 0, max_chars)
+            
+            if split_idx == -1:
+                # Fallback to single newline
+                split_idx = content.rfind('\n', 0, max_chars)
+            
+            if split_idx == -1:
+                # Fallback to sentence end
+                split_idx = content.rfind('. ', 0, max_chars)
+                
+            if split_idx == -1:
+                # Hard fallback
+                split_idx = max_chars
+                
+            parts.append(content[:split_idx].strip())
+            content = content[split_idx:].strip()
+            
+        if content:
+            parts.append(content)
+        return parts
+
     def chunk_text(self, text: str, max_chars: int = 500) -> List[str]:
         """
         Split text into chunks suitable for TTS processing.

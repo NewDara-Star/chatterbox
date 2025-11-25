@@ -1,6 +1,9 @@
 #!/bin/bash
-# Activate the isolated environment
-source "$(dirname "$0")/venv_sfx/bin/activate"
+# Activate virtual environment
+source venv_sfx/bin/activate
 
-# Run the CLI script with arguments
-python "$(dirname "$0")/generate_sfx_cli.py" "$@"
+# Fix MPS memory fragmentation
+export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
+
+# Run the CLI script with all arguments
+python generate_sfx_cli.py "$@"
