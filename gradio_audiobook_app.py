@@ -248,6 +248,96 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
     gr.Markdown("Convert PDF and DOCX files to audiobooks using your cloned voice.")
     
     with gr.Tabs():
+        # Tab 0: Book Analysis (NEW)
+        with gr.Tab("📚 Book Analysis"):
+            gr.Markdown("""
+            ### Analyze Full Book to Generate Character Bible
+            Upload your complete book to extract character descriptions, visual style, and validate text quality.
+            This creates a "Character Bible" for consistent image generation across all chapters.
+            """)
+            
+            with gr.Row():
+                with gr.Column(scale=1):
+                    book_file_input = gr.File(
+                        label="Upload Full Book (PDF, DOCX, or TXT)",
+                        file_types=[".pdf", ".doc", ".docx", ".txt"]
+                    )
+                    book_title_input = gr.Textbox(
+                        label="Book Title",
+                        placeholder="e.g., The Dawn of Yangchen"
+                    )
+                    analyze_book_btn = gr.Button("🔍 Analyze Book & Generate Character Bible", variant="primary")
+                
+                with gr.Column(scale=1):
+                    book_analysis_status = gr.Textbox(
+                        label="Status",
+                        value="Ready",
+                        interactive=False
+                    )
+                    character_bible_output = gr.JSON(
+                        label="Character Bible Preview",
+                        visible=False
+                    )
+                    extraction_report_output = gr.JSON(
+                        label="Text Quality Report",
+                        visible=False
+                    )
+                    download_bible_btn = gr.DownloadButton(
+                        label="📥 Download Character Bible",
+                        visible=False
+                    )
+            
+            def analyze_full_book(book_file, book_title):
+                """Analyze full book to generate Character Bible."""
+                if not book_file:
+                    return (
+                        "❌ Please upload a book file",
+                        gr.update(visible=False),
+                        gr.update(visible=False),
+                        gr.update(visible=False)
+                    )
+                
+                try:
+                    from director import Director
+                    from audiobook_utils import DocumentParser
+                    
+                    # Parse document
+                    parser = DocumentParser()
+                    book_text, metadata = parser.parse_document(book_file.name)
+                    
+                    # Analyze with Director Mode 1
+                    director = Director(provider="anthropic")  # Default to Anthropic
+                    result = director.analyze_full_book(book_text, book_title or "Untitled")
+                    
+                    # Save Character Bible
+                    bible_path = Path("chapter_drafts/character_bible.json")
+                    bible_path.parent.mkdir(exist_ok=True)
+                    
+                    import json
+                    with open(bible_path, 'w') as f:
+                        json.dump(result["character_bible"], f, indent=2)
+                    
+                    return (
+                        f"✅ Analysis complete! Found {len(result['character_bible'].get('characters', []))} characters. Quality score: {result['extraction_report']['quality_score']}/100",
+                        gr.update(value=result["character_bible"], visible=True),
+                        gr.update(value=result["extraction_report"], visible=True),
+                        gr.update(value=str(bible_path), visible=True)
+                    )
+                    
+                except Exception as e:
+                    return (
+                        f"❌ Error: {str(e)}",
+                        gr.update(visible=False),
+                        gr.update(visible=False),
+                        gr.update(visible=False)
+                    )
+            
+            analyze_book_btn.click(
+                fn=analyze_full_book,
+                inputs=[book_file_input, book_title_input],
+                outputs=[book_analysis_status, character_bible_output, extraction_report_output, download_bible_btn]
+            )
+        
         # Tab 1: Create Audiobook
         with gr.Tab("Create Audiobook"):
             with gr.Row():
