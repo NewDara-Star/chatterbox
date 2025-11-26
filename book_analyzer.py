@@ -152,11 +152,11 @@ Text (first 50,000 characters):
 
 Generate the complete Character Bible JSON."""
         
-        # Call LLM
+        # Call LLM (adjust max_tokens based on provider)
         if self.provider == "anthropic":
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=16000,
+                max_tokens=16000,  # Claude supports 16k
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}]
             )
@@ -168,7 +168,7 @@ Generate the complete Character Bible JSON."""
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                max_tokens=16000
+                max_tokens=4096  # OpenAI limit
             )
             result_text = response.choices[0].message.content
         
