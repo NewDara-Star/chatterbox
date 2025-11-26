@@ -17,11 +17,23 @@ from docx import Document
 class DocumentParser:
     """Parse documents and extract clean text for TTS processing."""
     
-    def __init__(self):
+    def __init__(self, use_llm_cleanup: bool = False, llm_provider: str = None, api_key: str = None):
         """
         Initialize the document parser.
+        
+        Args:
+            use_llm_cleanup: Whether to use LLM for intelligent text cleanup
+            llm_provider: LLM provider for cleanup ("anthropic" or "openai")
+            api_key: Optional API key (uses .env if not provided)
         """
         self.supported_formats = ['.pdf', '.doc', '.docx', '.txt']
+        self.use_llm_cleanup = use_llm_cleanup
+        self.llm_provider = llm_provider
+        self.api_key = api_key
+        
+        # Initialize LLM client if cleanup is enabled
+        if self.use_llm_cleanup:
+            self._init_llm_client()
     
     def parse_document(self, file_path: str) -> Tuple[str, dict]:
         """
@@ -56,6 +68,9 @@ class DocumentParser:
             text, page_count = self._parse_pdf(path)
         elif extension in ['.doc', '.docx']:
             text, page_count = self._parse_docx(path)
+            # Apply LLM cleanup if enabled specifically for DOCX, before general cleanup
+            if self.use_llm_cleanup:
+                text = self._clean_text_with_llm(text) # Assuming this method exists or will be added
         elif extension == '.txt':
             text, page_count = self._parse_txt(path)
         else:
@@ -63,6 +78,10 @@ class DocumentParser:
         
         # Clean the text (Regex-based)
         text = self._clean_text(text)
+        
+        # Apply LLM cleanup if enabled (this is the general one, after regex cleanup)
+        if self.use_llm_cleanup and extension != '.pdf': # Only apply if not already applied for PDF
+            text = self._clean_text_with_llm(text) # Assuming this method exists or will be added
         
         # Generate metadata
         metadata = {
@@ -225,6 +244,99 @@ class DocumentParser:
         text = text.strip()
         
         return text
+    
+    def _init_llm_client(self):
+        """Initialize LLM client for text cleanup."""
+        import os
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        if not self.llm_provider:
+            # Default to Anthropic
+            self.llm_provider = "anthropic"
+        
+        if self.llm_provider == "anthropic":
+            import anthropic
+            api_key = self.api_key or os.getenv("ANTHROPIC_API_KEY")
+            if not api_key:
+                raise ValueError("ANTHROPIC_API_KEY not found. Set in .env or pass as parameter.")
+            self.llm_client = anthropic.Anthropic(api_key=api_key)
+            self.llm_model = "claude-3-5-sonnet-20241022"
+        elif self.llm_provider == "openai":
+            import openai
+            api_key = self.api_key or os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY not found. Set in .env or pass as parameter.")
+            self.llm_client = openai.OpenAI(api_key=api_key)
+            self.llm_model = "gpt-4-turbo-preview"
+        else:
+            raise ValueError(f"Invalid LLM provider: {self.llm_provider}")
+    
+    def _clean_text_with_llm(self, text: str) -> str:
+        """
+        Use LLM to intelligently clean OCR errors and formatting issues.
+        
+        Args:
+            text: Raw extracted text
+        
+        Returns:
+            Cleaned text suitable for TTS
+        """
+        print("🧠 Cleaning text with LLM (this may take a moment)...")
+        
+        system_prompt = """You are a text cleanup expert. Your task is to clean OCR-extracted text for audiobook narration.
+
+CRITICAL RULES:
+1. **Preserve Story Content**: Keep ALL story text verbatim. Do NOT summarize, paraphrase, or skip any narrative content.
+2. **Remove Non-Story Elements**:
+   - Page numbers (e.g., "Page 42", "- 78 -")
+   - Headers/footers (book title, chapter title at top/bottom of pages)
+   - Copyright notices, ISBN, publisher info
+   - Table of contents entries mixed in body text
+3. **Fix OCR Errors**:
+   - Broken words: "th e" → "the", "wor ld" → "world"
+   - Merged words: "thetree" → "the tree"
+   - Character substitutions: "0" (zero) → "O", "1" (one) → "I" or "l"
+   - Garbled punctuation: "dont" → "don't", "Its" → "It's"
+4. **Clean Formatting**:
+   - Remove excessive line breaks (keep paragraph structure)
+   - Fix chapter headings (keep them, but clean format)
+   - Preserve dialogue formatting
+5. **Output**: Return ONLY the cleaned text. No explanations, no comments."""
+
+        user_prompt = f"""Clean this text for audiobook narration:
+
+{text[:20000]}
+
+Return the cleaned text."""
+
+        try:
+            if self.llm_provider == "anthropic":
+                response = self.llm_client.messages.create(
+                    model=self.llm_model,
+                    max_tokens=16000,
+                    system=system_prompt,
+                    messages=[{"role": "user", "content": user_prompt}]
+                )
+                cleaned_text = response.content[0].text
+            else:  # openai
+                response = self.llm_client.chat.completions.create(
+                    model=self.llm_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    max_tokens=4096
+                )
+                cleaned_text = response.choices[0].message.content
+            
+            print(f"✅ Text cleaned: {len(text)} → {len(cleaned_text)} characters")
+            return cleaned_text
+            
+        except Exception as e:
+            print(f"⚠️  LLM cleanup failed: {e}. Using original text.")
+            return text
+
     
     def split_into_chapters(self, text: str, max_chars: int = 30000) -> List[Tuple[str, str]]:
         """

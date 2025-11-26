@@ -52,14 +52,14 @@ class JobManager:
         self.lock = threading.Lock()
         self.current_job_id = None # To track the currently active job for UI polling
 
-    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx=False):
+    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
         """Start a new background job."""
         job_id = str(uuid.uuid4())
         
         # Create thread
         thread = threading.Thread(
             target=self._run_job,
-            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx),
+            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx),
             kwargs={'job_id': job_id}
         )
         
@@ -78,7 +78,7 @@ class JobManager:
         thread.start()
         return 0.0, "Starting job..."
 
-    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, detect_sfx=False, job_id=None):
+    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False, job_id=None):
         """Worker function."""
         try:
             # Initialize generator here to pass parameters dynamically
@@ -97,26 +97,32 @@ class JobManager:
                         self.jobs[job_id]['progress'] = p
                         self.jobs[job_id]['message'] = msg
             
+            # Ensure output_file is defined, e.g., using a temporary file or a fixed name
+            # For now, let's assume a fixed name as in the original generate_audiobook call
+            output_file = Path("generated_audiobook.wav")
+
             output_path = generator.generate_audiobook(
                 input_path=file_path,
-                output_path="generated_audiobook.wav",
+                output_path=str(output_file),
                 voice_name=voice_name if not custom_voice_file else None,
-                voice_path=voice_path,
-                progress_callback=progress_callback,
-                detect_sfx=detect_sfx,
+                voice_path=custom_voice_file,
                 exaggeration=exaggeration,
                 temperature=temperature,
                 cfg_weight=cfg_weight,
                 min_p=min_p,
                 top_p=top_p,
-                repetition_penalty=repetition_penalty
+                repetition_penalty=repetition_penalty,
+                use_llm_cleanup=use_llm_cleanup, # Changed from self.use_llm_cleanup
+                detect_sfx=detect_sfx,
+                progress_callback=progress_callback
             )
             
-            with self._lock:
-                self.status = "COMPLETED"
-                self.progress = 1.0
-                self.message = "Generation complete!"
-                self.result_path = result_path
+            with self.lock: # Changed from self._lock to self.lock
+                if job_id in self.jobs:
+                    self.jobs[job_id]['status'] = "COMPLETED"
+                    self.jobs[job_id]['progress'] = 1.0
+                    self.jobs[job_id]['message'] = "Generation complete!"
+                    self.jobs[job_id]['result'] = output_path # Changed from result_path
                 
         except Exception as e:
             print(f"Job failed: {e}")

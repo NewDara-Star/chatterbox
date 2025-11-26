@@ -62,19 +62,20 @@ class AudiobookGenerator:
             self.num_workers = max(1, min(multiprocessing.cpu_count() - 2, 8))
             print(f"Parallel processing enabled: {self.num_workers} workers")
     
-    def prepare_chapters(self, input_path: str, output_dir: str) -> List[str]:
+    def prepare_chapters(self, input_path: str, use_llm_cleanup: bool = False) -> List[Tuple[str, str]]:
         """
-        Parse document, clean text, and split into chapter files for review.
+        Prepare chapters from input document.
         
         Args:
             input_path: Path to input document
-            output_dir: Directory to save chapter text files
+            use_llm_cleanup: Whether to use LLM for intelligent text cleanup
             
         Returns:
-            List of absolute paths to generated text files
+            List of (chapter_title, chapter_text) tuples
         """
         print(f"Preparing chapters from: {input_path}")
-        text, metadata = self.parser.parse_document(input_path)
+        parser = DocumentParser(use_llm_cleanup=use_llm_cleanup)
+        text, metadata = parser.parse_document(input_path)
         
         # Split into chapters (enforcing 30k limit)
         chapters = self.parser.split_into_chapters(text)
@@ -305,51 +306,46 @@ class AudiobookGenerator:
     def generate_audiobook(
         self,
         input_path: str,
-        output_path: str,
+        output_path: str = "audiobook.wav",
         voice_name: Optional[str] = None,
         voice_path: Optional[str] = None,
-        progress_callback: Optional[Callable[[float, str], None]] = None,
-        detect_sfx: bool = False,
-        # Advanced audio settings
         exaggeration: float = 0.5,
         temperature: float = 0.8,
         cfg_weight: float = 0.5,
         min_p: float = 0.05,
         top_p: float = 1.0,
-        repetition_penalty: float = 1.2
+        repetition_penalty: float = 1.2,
+        use_llm_cleanup: bool = False,
+        detect_sfx: bool = False,
+        progress_callback: Optional[callable] = None
     ) -> str:
         """
-        Generate an audiobook from a document (Chapter-Based).
+        Generate audiobook from document with optional LLM text cleanup and SFX.
         
         Args:
-            input_path: Path to input document (PDF, DOCX)
-            output_path: Path to save output audio (WAV)
+            input_path: Path to input document (PDF, DOCX, TXT)
+            output_path: Path for output audio file
             voice_name: Name of saved voice to use
-            voice_path: Path to specific voice file (overrides voice_name)
-            progress_callback: Function to call with progress updates
-            detect_sfx: If True, detect and save sound effect suggestions
-            exaggeration: Exaggeration factor (0.5 = neutral)
-            temperature: Sampling temperature (0.8 default)
-            cfg_weight: Classifier-free guidance weight (0.5 default)
-            min_p: Min-p sampling (0.05 default)
-            top_p: Top-p sampling (1.0 default)
-            repetition_penalty: Repetition penalty (1.2 default)
+            voice_path: Direct path to voice reference audio
+            exaggeration: TTS parameter (0.25-2.0)
+            temperature: TTS parameter (0.05-5.0)
+            cfg_weight: TTS parameter (0.0-1.0)
+            min_p: TTS parameter (0.0-1.0)
+            top_p: TTS parameter (0.0-1.0)
+            repetition_penalty: TTS parameter (1.0-2.0)
+            use_llm_cleanup: Use LLM to clean OCR errors intelligently
+            detect_sfx: Detect and mix sound effects
+            progress_callback: Optional callback(progress_pct, message)
             
         Returns:
             Path to generated audiobook file
         """
         start_time = time.time()
         
-        # 1. Parse Document
+        # Step 1: Prepare chapters
         if progress_callback:
-            progress_callback(0.05, "Parsing document...")
-            
-        print(f"Parsing document: {input_path}")
-        text, metadata = self.parser.parse_document(input_path)
-        
-        # Split into chapters
-        chapters = self.parser.split_into_chapters(text)
-        print(f"Document parsed: {metadata['page_count']} pages, {len(chapters)} chapters")
+            progress_callback(0.05, "Preparing chapters...")
+        chapters = self.prepare_chapters(input_path, use_llm_cleanup=use_llm_cleanup)
         
         # 2. Prepare Voice
         ref_voice_path = None
