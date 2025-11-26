@@ -1,0 +1,212 @@
+{
+  "book_title": "Voices of the Past",
+  "characters": [
+    {
+      "name": "Jetsun",
+      "importance": "Main",
+      "physical_traits": {
+        "race_ethnicity": "Tibetan/Asian",
+        "age_range": "young adult",
+        "height": "average",
+        "build": "slender",
+        "hair": {
+          "color": "#000000",
+          "style": "possibly kept long or in traditional style, given setting",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "#F8D568",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [
+          "#FFFFFF",
+          "#0000FF"
+        ],
+        "signature_items": [
+          "air temple robes"
+        ],
+        "style_keywords": [
+          "traditional",
+          "monastic"
+        ]
+      },
+      "personality_traits": "Determined, empathetic, and action-oriented."
+    },
+    {
+      "name": "Tsering",
+      "importance": "Secondary",
+      "physical_traits": {
+        "race_ethnicity": "Tibetan/Asian",
+        "age_range": "elderly",
+        "height": "short",
+        "build": "average",
+        "hair": {
+          "color": "#8B4513 (estimate for graying hair)",
+          "style": "styled in a manner suitable for her age and status",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "#F8D568",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [
+          "#FFFFFF",
+          "#8B4513"
+        ],
+        "signature_items": [
+          "librarian robes/cloak"
+        ],
+        "style_keywords": [
+          "traditional",
+          "elderly",
+          "wisdom-representing"
+        ]
+      },
+      "personality_traits": "Kind and knowledgeable with a hint of frustration in challenging situations."
+    },
+    {
+      "name": "Abbess Dagmola",
+      "importance": "Secondary",
+      "physical_traits": {
+        "race_ethnicity": "Tibetan/Asian",
+        "age_range": "elderly",
+        "height": "average",
+        "build": "average",
+        "hair": {
+          "color": "#D2B48C (assuming an older individual)",
+          "style": "likely traditional and simple, suited to her status",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "#F8D568",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [
+          "#FFFFFF",
+          "#DEB887"
+        ],
+        "signature_items": [
+          "abbess' ceremonial robes"
+        ],
+        "style_keywords": [
+          "traditional",
+          "spiritual leader"
+        ]
+      },
+      "personality_traits": "Leader qualities; calm, collected, and caring."
+    },
+    {
+      "name": "Yangchen",
+      "importance": "Secondary",
+      "physical_traits": {
+        "race_ethnicity": "Tibetan/Asian",
+        "age_range": "child, 8 years",
+        "height": "short",
+        "build": "slender",
+        "hair": {
+          "color": "#000000",
+          "style": "simplistic, child-like",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "#F8D568",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [
+          "#FFFFFF",
+          "#778899"
+        ],
+        "signature_items": [
+          "simple, traditional attire appropriate for her age"
+        ],
+        "style_keywords": [
+          "innocent",
+          "childlike",
+          "traditional"
+        ]
+      },
+      "personality_traits": "Suffering, strong despite young age, possibly wise beyond her years."
+    },
+    {
+      "name": "Mesose",
+      "importance": "Minor",
+      "physical_traits": {
+        "race_ethnicity": "unknown",
+        "age_range": "unknown",
+        "height": "unknown",
+        "build": "unknown",
+        "hair": {
+          "color": "unknown",
+          "style": "unknown",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "unknown",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [],
+        "signature_items": [],
+        "style_keywords": []
+      },
+      "personality_traits": "Famous scholar, discussed posthumously, associated with learning and possibly poetry."
+    },
+    {
+      "name": "Avatar Gun",
+      "importance": "Minor",
+      "physical_traits": {
+        "race_ethnicity": "unknown",
+        "age_range": "unknown",
+        "height": "unknown",
+        "build": "unknown",
+        "hair": {
+          "color": "unknown",
+          "style": "unknown",
+          "texture": "unknown"
+        },
+        "eyes": {
+          "color": "unknown",
+          "shape": "unknown"
+        },
+        "skin_tone": "unknown",
+        "distinguishing_marks": []
+      },
+      "clothing_palette": {
+        "dominant_colors": [],
+        "signature_items": [],
+        "style_keywords": []
+      },
+      "personality_traits": "Seen as brave but troubled by failure; grief-stricken after friend's death."
+    }
+  ],
+  "world_style": {
+    "setting": "Fantasy, Asian-inspired temples and ancient libraries",
+    "genre": "Fantasy",
+    "color_palette": [
+      "#FFFFFF",
+      "#000000",
+      "#8B4513"
+    ],
+    "lighting_mood": "Natural, with contrasts of dark interiors and bright exteriors",
+    "architectural_style": "Ancient Asian temples and libraries with tall shelves, stone structures, and intricate designs"
+  }
+}

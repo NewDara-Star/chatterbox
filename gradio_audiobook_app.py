@@ -171,7 +171,7 @@ def analyze_document(file):
     try:
         # Create a parser just for analysis (no LLM cleanup needed here)
         from audiobook_utils import DocumentParser
-        parser = DocumentParser(use_llm_cleanup=False)
+        parser = DocumentParser()
         
         text, metadata = parser.parse_document(file.name)
         

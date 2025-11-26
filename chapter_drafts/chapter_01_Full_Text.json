@@ -1,101 +1,1405 @@
 {
-  "chapter_title": "VOICES OF THE PAST",
-  "overall_mood": "Mysterious and Tense",
+  "chapter_title": "Full Text",
+  "overall_mood": "Neutral",
   "scenes": [
     {
-      "id": 1,
-      "text_segment": "Jetsun paced down the hallway, trying to stay ahead of the screams.\n\nThe high ceilings of the Western Air Temple tended to make echoes of\n\nwhispers and explosions of dropped teacups. Though the girl was back in\n\nthe infirmary being watched by the elders, her cries of pain sprang from\n\nevery surface, bouncing off the hard stone.",
-      "visual_prompt": "Wide shot of an ancient temple hallway, high ceilings with intricate carvings, dimly lit with flickering torchlight casting long shadows. The atmosphere is tense with an echoing soundscape, as if screams are reverberating off the stone walls. The camera slowly tracks along the hallway, capturing the sense of urgency and foreboding.",
+      "text_segment": "Title: Full Text VOICES OF THE PAST Jetsun paced down the hallway, trying to stay ahead of the screams. The high ceilings of the Western Air Temple tended to make echoes of whispers and explosions of dropped teacups. Though the girl was back in the infirmary being watched by the elders, her cries of pain sprang from every surface, bouncing off the hard stone. Jetsun couldn\u2019t take it anymore and broke into a full run. Ignoring decorum, she sped past her sisters, ruffling robes, upsetting inkpots, prematurely ruining colorful sand paintings that were meant to be ruined only once they were finished.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The scene is set in the austere, ancient corridors of the Western Air Temple during dawn, where the early light begins to infiltrate the space. The architecture is grand, with high ceilings and long, echoing hallways made of stone, adorned sporadically with vibrant sand paintings and relics of spiritual significance. The atmosphere is charged with a mix of serenity outside and turmoil within, as Jetsun moves through this hallowed space.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Cool (6500K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#546E7A",
+            "#FFE0B2"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "Jetsun",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "3200",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Running",
+              "expression": "Determined",
+              "clothing": "Traditional Air Nomad robes",
+              "color": "#A5D6A7",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Hair tousled by the rush",
+              "Bare feet barely touching the cold stone floor",
+              "Fingers slightly curled as if bracing for impact"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun casts shadow on the stone floor"
+        ]
+      },
       "audio_cues": [
         {
           "timestamp": "start",
-          "sfx": "distant_echoing_screams",
-          "description": "faint, haunting screams reverberating through the hallway"
-        },
-        {
-          "timestamp": "mid",
-          "sfx": "footsteps_on_stone",
-          "description": "quick, echoing footsteps on stone floor"
+          "sfx": "echoing footsteps",
+          "description": "The soft yet sharp echo of Jetsun's bare feet against the stone floor"
         }
       ],
-      "mood": "Anxious",
-      "pacing": "Fast"
+      "mood": "Tense",
+      "pacing": "Fast",
+      "id": 1
     },
     {
-      "id": 2,
-      "text_segment": "Jetsun couldn\u2019t take it anymore and broke into a full run. Ignoring\n\ndecorum, she sped past her sisters, ruffling robes, upsetting inkpots,\n\nprematurely ruining colorful sand paintings that were meant to be ruined\n\nonly once they were finished. No one scolded her or gave her sharp looks in\n\npassing. They understood.",
-      "visual_prompt": "Dynamic shot of Jetsun running through a corridor, her robes billowing behind her, sand paintings scattering in a flurry of colors. The camera uses a handheld style to convey urgency, focusing on the motion blur of her rapid movement. The lighting is soft but chaotic, capturing the disruption she leaves in her wake.",
+      "text_segment": "No one scolded her or gave her sharp looks in passing. They understood. When she ran out of floor, she jumped. The upside-down construction of the temple meant that despite its overall size, there was very little space to stand on, nothing connecting the spires but thin air and a three-thousandfoot drop. She didn\u2019t have her glider. Eminently dangerous, but she could make the leap without it. Air at her back and air against her robes gave her enough loft to land on the next tower, the one containing the Great Library.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "This scene unfolds at the precipice of an ancient, upside-down temple suspended in the sky at dawn. The sky is painted with the soft hues of early morning, casting everything in a serene yet eerie glow. The temple's architecture, a marvel of gravity-defying construction, features towers and spires that jut downwards towards the earth, connected by barely visible bridges. The atmosphere is clear, with a few wisps of clouds below, emphasizing the temple's height. The lighting is primarily natural sunlight with a soft, diffused quality, coming from the horizon and giving the scene a warm, golden hue.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Backlit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#FAD6A5",
+            "#C7B198"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "The doorway",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "100",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "CHARACTER_NAME",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Running",
+              "expression": "Determined",
+              "clothing": "Flowing robes detailed in the Character Bible",
+              "color": "#5A4E4D (robes), #DAA520 (accents)",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "The character's hair is tied back, fluttering against the wind",
+              "A small, intricate pendant glows softly around her neck, barely visible",
+              "Tiny beads of sweat on her forehead, highlighting the peril of her action",
+              "The edge of her robe frays slightly, suggesting many previous adventures",
+              "Her feet are barely touching the edge of the temple spire, emphasizing the leap"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "The character's shadow casts downwards towards the temple spires"
+        ]
+      },
       "audio_cues": [
         {
           "timestamp": "start",
-          "sfx": "rustling_fabric",
-          "description": "sound of robes flapping as Jetsun runs"
-        },
-        {
-          "timestamp": "end",
-          "sfx": "inkpot_clatter",
-          "description": "inkpots clattering to the ground"
+          "sfx": "wind_howling",
+          "description": "The sound of wind accentuates the height and danger of the leap"
         }
       ],
-      "mood": "Urgent",
-      "pacing": "Fast"
+      "mood": "Tense",
+      "pacing": "Fast",
+      "id": 2
     },
     {
-      "id": 3,
-      "text_segment": "When she ran out of floor, she jumped. The upside-down construction\n\nof the temple meant that despite its overall size, there was very little space\n\nto stand on, nothing connecting the spires but thin air and a three-thousandfoot drop. She didn\u2019t have her glider. Eminently dangerous, but she could\n\nmake the leap without it.\n\nAir at her back and air against her robes gave her enough loft to land on\n\nthe next tower, the one containing the Great Library.",
-      "visual_prompt": "Cinematic wide shot of the temple's architecture, showcasing its upside-down construction with spires and vast empty spaces. Jetsun is captured mid-leap, her robes fluttering as she defies gravity. The camera follows her trajectory in slow motion, highlighting the vast drop below and the daring nature of her jump. The lighting is dramatic, with a sunset glow illuminating her path.",
-      "audio_cues": [
-        {
-          "timestamp": "start",
-          "sfx": "wind_rush",
-          "description": "powerful gusts of wind as Jetsun leaps"
+      "text_segment": "Tsering, chief caretaker of the books, waited in front of the tall shelves. The older woman\u2019s kind eyes were edged with worry. \u201cI saw you coming. Is it happening again?\u201d Jetsun nodded. \u201cMesose,\u201d she said. Tsering blew out a breath, a silent whistle of frustration. \u201cThat could be Mesose, famous scholar of the Ru Ming era. There\u2019s a Mesose village in Hu Xin; it might have been named after a founder. Or it could just be someone called Mesose, in which case we\u2019re stuck.\u201d Avatars tended to run in exalted circles. Or they elevated the people around them to fame.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "A dimly lit, vast library filled with towering shelves of ancient books and scrolls. The air is heavy with the scent of aged paper and wood. It's early morning, and the first rays of sunlight filter through large, dust-speckled windows, creating a serene yet mysterious atmosphere. The library is silent except for the soft, echoing footsteps of its two inhabitants.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Diffused",
+            "color_temp": "Warm (3000K)"
+          }
         },
-        {
-          "timestamp": "end",
-          "sfx": "soft_landing",
-          "description": "gentle thud as she lands on the next tower"
-        }
-      ],
-      "mood": "Daring and Intense",
-      "pacing": "Moderate"
-    },
-    {
-      "id": 4,
-      "text_segment": "Tsering, chief\n\ncaretaker of the books, waited in front of the tall shelves. The older\n\nwoman\u2019s kind eyes were edged with worry. \u201cI saw you coming. Is it\n\nhappening again?\u201d\n\nJetsun nodded. \u201cMesose,\u201d she said.\n\nTsering blew out a breath, a silent whistle of frustration. \u201cThat could be\n\nMesose, famous scholar of the Ru Ming era. There\u2019s a Mesose village in Hu\n\nXin; it might have been named after a founder. Or it could just be someone\n\ncalled Mesose, in which case we\u2019re stuck.\u201d",
-      "visual_prompt": "Medium shot in the Great Library, Tsering stands in front of towering bookshelves filled with ancient scrolls and tomes. The lighting is soft and ambient, casting gentle shadows across the room. The camera focuses on Tsering's face, capturing the concern and wisdom in her eyes as she converses with Jetsun.",
+        "color_palette": {
+          "dominant_hex": [
+            "#8C715A",
+            "#3A2D23"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot",
+          "depth_of_field": "Medium (f/4-f/5.6)",
+          "focal_point": "Character's eyes",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Tsering",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Left-third",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Worried",
+              "clothing": "A traditional, floor-length robe embroidered with intricate designs",
+              "color": "#987856",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "A silver hairpin loosely holding her hair",
+              "Deep creases around her eyes, showing age and concern",
+              "A worn leather bracelet on her wrist",
+              "Faint ink stains on her fingers",
+              "A delicate, yet authoritative posture"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Center-frame",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Determined",
+              "clothing": "A simple, utilitarian outfit suited for travel",
+              "color": "#5A4E42",
+              "texture": "Leather (worn)",
+              "lighting_on_object": "Shadow-side"
+            },
+            "micro_details": [
+              "A small, intricately carved amulet hangs around her neck",
+              "A map peeks out from one of her pockets",
+              "Her boots are scuffed and dusty from the road",
+              "Her hair is pulled back in a practical bun",
+              "Carries a sense of urgency in her stance"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Tsering's shadow casts onto the bookshelves"
+        ]
+      },
       "audio_cues": [
         {
           "timestamp": "start",
           "sfx": "library_ambience",
-          "description": "soft rustling of pages and distant murmurs"
-        },
-        {
-          "timestamp": "end",
-          "sfx": "frustrated_sigh",
-          "description": "Tsering's gentle but frustrated sigh"
+          "description": "The subtle sound of pages being turned and a distant echo of footsteps on the wooden floor."
         }
       ],
-      "mood": "Contemplative and Concerned",
-      "pacing": "Slow"
+      "mood": "Suspenseful",
+      "pacing": "Medium",
+      "id": 3
     },
     {
-      "id": 5,
-      "text_segment": "They split up to search different sections of the ancient vault. Jetsun ran\n\nher eyes over labels and titles as fast as she could. Not every book fit on a\n\nshelf. Many of the tomes kept at the Western Temple were so old they were\n\nwritten on bamboo slips instead of paper. She passed rolled bales of text\n\nwider around than some of the pillars connecting the ceilings to the floors.",
-      "visual_prompt": "Tracking shot following Jetsun as she navigates the labyrinthine aisles of the library. The camera pans across rows of ancient bamboo texts and scrolls, capturing the texture and age of the materials. The lighting is dim, with focused beams highlighting Jetsun's path and the intricate details of the texts.",
+      "text_segment": "\u201cIt has to be the first one,\u201d Jetsun said. Another wail turned both their heads. The child was suffering. \u201cHelp me and it\u2019ll go faster,\u201d Tsering said. \u201cNorthwest corner, start with the poetry shelves, Ru with the three drops of water radical.\u201d They split up to search different sections of the ancient vault. Jetsun ran her eyes over labels and titles as fast as she could. Not every book fit on a shelf. Many of the tomes kept at the Western Temple were so old they were written on bamboo slips instead of paper.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "In a dimly lit, extensive vault filled with the ancient knowledge of the Western Temple, Jetsun and Tsering are searching frantically for a specific tome. The air is thick with dust particles, floating lazily in beams of light that manage to seep in through the small windows near the vault's ceiling. The shelves, carved from dark, aged wood, are crammed with books, scrolls, and bamboo slips, some of which spill onto the floor, creating an impression of organized chaos. The feeling of urgency is palpable as the child's distant wails echo through the stone corridors, emphasizing the gravity of their quest.",
+          "time_of_day": "Dusk",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Candlelight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#4A4238",
+            "#D9CAB3"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "The artifact",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Tungsten (3200K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Determined",
+              "clothing": "Dark maroon robe with golden trim, symbol of the Western Temple embroidered on the sleeve",
+              "color": "#800000 for robe, #FFD700 for trim",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Sweat beads on forehead",
+              "Fingers stained with ink",
+              "A worn leather satchel slung over one shoulder",
+              "Loose bamboo slips peeking from the satchel",
+              "Faint scars visible on exposed skin"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Tsering",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Background-left",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Bending",
+              "expression": "Focused",
+              "clothing": "Simpler monk's attire, undyed and frayed at the edges",
+              "color": "#BDB76B",
+              "texture": "Cotton",
+              "lighting_on_object": "Shadow-side"
+            },
+            "micro_details": [
+              "A cluster of scrolls under one arm",
+              "Furrowed brow under the hood",
+              "Dusty hands",
+              "A single, small earring with a turquoise bead",
+              "Rope belt loosely tied around the waist"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun's shadow casts on the bamboo slips"
+        ]
+      },
       "audio_cues": [
         {
           "timestamp": "start",
-          "sfx": "paper_rustle",
-          "description": "gentle rustling of paper and bamboo as Jetsun searches"
-        },
-        {
-          "timestamp": "end",
-          "sfx": "scroll_roll",
-          "description": "the soft sound of a scroll being unrolled"
+          "sfx": "distant wail",
+          "description": "A haunting, distant wail echoes through the stone walls, adding a layer of urgency and distress to the scene."
         }
       ],
-      "mood": "Focused and Determined",
-      "pacing": "Steady"
+      "mood": "Suspenseful",
+      "pacing": "Fast",
+      "id": 4
+    },
+    {
+      "text_segment": "She passed rolled bales of text wider around than some of the pillars connecting the ceilings to the floors. Five minutes later she emerged from the library\u2019s depths, clutching a treatise on she didn\u2019t know exactly what. What mattered was the author\u2019s name. Tsering met her by the door. \u201cI couldn\u2019t find any leads. You\u2019re holding our best shot.\u201d \u201cThank you.\u201d Jetsun sprinted back in the direction she came, the book tucked under her arm. \u201cUse your glider next time!\u201d Tsering yelled. Jetsun burst back into the infirmary. The huddle of elders parted to let her through.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The scene unfolds in a vast, ancient library, transitioning to a dimly lit infirmary. The library is filled with towering bales of texts and enormous pillars that stretch from the floor to the high ceiling, creating a labyrinthine network of knowledge. As dawn breaks, the first rays of sunlight filter through the high windows, casting long, dramatic shadows across the stone floor. The weather outside is serene, contributing to a tranquil yet suspenseful atmosphere inside. The lighting transitions from soft, natural sunlight in the library to mixed, softer artificial light in the infirmary.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Mixed",
+            "direction": "Top-down in the library, Side-lit in the infirmary",
+            "quality": "Diffused in the library, Soft in the infirmary",
+            "color_temp": "Neutral in the library, Warm (3000K) in the infirmary"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#D6CBB0",
+            "#8D775F"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot in the library, Medium-shot in the infirmary",
+          "depth_of_field": "Deep (f/11) in the library, Medium (f/5.6) in the infirmary",
+          "focal_point": "The book",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame in the library, Background-right in the infirmary",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Running",
+              "expression": "Determined",
+              "clothing": "Traditional robes with intricate patterns",
+              "color": "#7A9D96",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit in the library, Shadow-side in the infirmary"
+            },
+            "micro_details": [
+              "Sweat on her brow",
+              "Dust particles swirling around her as she moves",
+              "The grip on the book tightens as she runs"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Tsering",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Left-third by the library door",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Concerned",
+              "clothing": "Simple monk attire",
+              "color": "#A67B5B",
+              "texture": "Cotton",
+              "lighting_on_object": "Side-lit"
+            },
+            "micro_details": [
+              "A scroll half-tucked under the arm",
+              "Worry lines on the forehead",
+              "Eyes fixed on Jetsun"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun's shadow stretches towards Tsering"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "footsteps echoing",
+          "description": "Jetsun's rapid footsteps echo through the library and infirmary halls."
+        }
+      ],
+      "mood": "Suspenseful",
+      "pacing": "Fast",
+      "id": 5
+    },
+    {
+      "text_segment": "The girl\u2019s thrashing had settled into dry, cavernous sobs. She pounded her fist on her pillow over and over, not the involuntary shaking of a fever but rather the deliberate motion born of a steady, all-consuming anguish that should have been beyond her eight years. \u201cWe\u2019ll leave you two alone,\u201d Abbess Dagmola said. She and the rest of the nuns filed out. Too many people sometimes ruined the effect. Jetsun opened the book to a random page and began to read.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The room is sparsely furnished, walls adorned with faded tapestries depicting scenes of pastoral tranquility. A narrow bed sits against one wall, its linens disheveled from the girl's earlier tumult. The first light of dawn filters through a small window, casting the room in a soft, ethereal glow. The air is still, heavy with the residue of the girl's grief. Abbess Dagmola, a figure of composed authority, gestures silently, leading the departure of the nuns, their movements a quiet symphony of rustling fabrics and subdued footsteps. In the newly forged solitude, Jetsun, seated beside the bed, opens an ancient, leather-bound book.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#F4EAD3",
+            "#CABD96"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Low"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Medium (f/4-f/5.6)",
+          "focal_point": "The girl",
+          "aspect_ratio": "16:9",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "The girl",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Anguish",
+              "clothing": "Simple nightgown",
+              "color": "#FFFFFF",
+              "texture": "Cotton",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Tears streaking her face",
+              "Fist clenched tightly, knuckles white",
+              "Hair disarrayed, strands clinging to her damp cheeks"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Left-third",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Composed",
+              "clothing": "Monastic robes",
+              "color": "#6D5F47",
+              "texture": "Wool",
+              "lighting_on_object": "Soft"
+            },
+            "micro_details": [
+              "Hands gently holding the book",
+              "Eyes lowered to the page",
+              "Calm demeanor amidst the emotional turmoil"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun's shadow casts on the bed"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "ambient_morning_birds",
+          "description": "The gentle chirping of birds outside the window provides a serene backdrop to the emotional scene within."
+        },
+        {
+          "timestamp": "start",
+          "sfx": "page_turn",
+          "description": "The soft sound of a page turning as Jetsun begins to read."
+        }
+      ],
+      "mood": "Tense",
+      "pacing": "Slow",
+      "id": 6
+    },
+    {
+      "text_segment": "\u201c \u2018The level of risk can be determined by elevation, nearness to the source of water, vulnerability to rapid flows, and potential economic damage,\u2019 \u201d she said. Confused, she briefly turned the volume to look at the cover. A Discourse on Floodplain Management. Why in the world do we have this book? Jetsun shook her head. It didn\u2019t matter. \u201c \u2018Understanding previous measures taken to mitigate the damage from flooding is essential, for they might compile danger instead of reducing it.\u2019 \u201d The girl took a shuddering gasp of air and relaxed.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "In a dimly lit, cluttered study filled with books and papers strewn across a large oak desk, Jetsun sits in a heavy, leather-bound chair. The room is packed with shelves of books, a large window behind the desk shows the early light of dawn creeping in, casting long shadows across the wooden floor. The atmosphere is thick with the musky scent of old paper and the lingering aroma of extinguished candles.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Clear",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Backlit",
+            "quality": "Diffused",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#806D5A",
+            "#3A2E25"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "High"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Medium-shot",
+          "depth_of_field": "Shallow (f/1.4-f/2.8)",
+          "focal_point": "Character's eyes",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_007",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Confused",
+              "clothing": "A heavy woolen sweater and dark trousers",
+              "color": "#564D44 for sweater, #3A3A3A for trousers",
+              "texture": "Wool (worn)",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Fingers lightly gripping the book",
+              "A furrowed brow of concentration",
+              "A small, almost imperceptible scar on the left cheek",
+              "Wisps of hair escaping a loosely tied bun",
+              "The gentle rise and fall of her chest with the shuddering gasp"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Natural sunlight casts long shadows across the room"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "pages_flipping",
+          "description": "Jetsun flipping through the book"
+        }
+      ],
+      "mood": "Suspenseful",
+      "pacing": "Slow",
+      "id": 7
+    },
+    {
+      "text_segment": "\u201cHalf a year and that\u2019s as far as you\u2019ve gotten?\u201d she said, smiling at no one. \u201cYou have to stop taking on so many projects at once, Se-Se.\u201d It worked. Thank the spirits, it worked. Jetsun kept reading, plowing through the unfamiliar concepts mechanically. \u201c \u2018On the subject of silt deposits . . .\u2019 \u201d The first time the child went through this, they had no clue as to what was happening. The healers did their best to cool her fever and keep her as comfortable as they could.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "In a dimly lit, spacious room resembling a blend of a traditional study and an apothecary, Jetsun, a young child, sits at a large wooden desk cluttered with scrolls, books, and various ancient artifacts. The room is filled with shelves that reach the ceiling, crammed with books and herbs. The morning light filters softly through a large window, casting a serene glow over the room. The weather outside is clear, indicating it's a peaceful morning. The indoor lighting is supplemented with candlelight, adding a warm ambiance to the room.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Clear",
+          "lighting": {
+            "source": "Mixed",
+            "direction": "Side-lit",
+            "quality": "Diffused",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#8C7853",
+            "#D9CBA3"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Medium (f/4-f/5.6)",
+          "focal_point": "Jetsun",
+          "aspect_ratio": "16:9",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Focused",
+              "clothing": "A simple, earth-toned linen shirt and trousers",
+              "color": "#7B6E4E",
+              "texture": "Linen",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "A thin sheen of sweat on the brow",
+              "Fingers stained with ink",
+              "A half-open ancient scroll in front",
+              "Several open books around",
+              "A small pile of medicinal herbs to the side"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "The morning light casts a soft glow on Jetsun",
+          "The candlelight creates soft shadows on the objects on the desk"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "soft_wind",
+          "description": "A gentle breeze can be heard rustling the leaves outside, complementing the serene atmosphere of the room."
+        }
+      ],
+      "mood": "Calm",
+      "pacing": "Slow",
+      "id": 8
+    },
+    {
+      "text_segment": "As the incidents reoccurred, her babbling, incoherent at first, started to coalesce into sentences, names, slices of conversations. The words meant nothing to her caregivers until one day they heard her talking to His Majesty the Earth King Zhoulai. A man she\u2019d never met, who\u2019d died three centuries ago. Thankfully, the abbess had thought to take notes. She\u2019d written down every intelligible scrap, and in scouring her pages she pieced together a pattern. The names. Angilirq, Praew, Yotogawa. Names from every nation. Names of past Avatar companions.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "In a dimly lit, ancient library filled with towering bookshelves and scattered manuscripts, a young woman sits at a heavy wooden table, her eyes closed as if in deep meditation. The early morning light filters in through large, stained glass windows, casting colorful patterns on the stone floor. Dust particles dance in the air, illuminated by the rays of the rising sun. The atmosphere is serene yet charged with a mystical energy.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#D6CBB0",
+            "#897C5A"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "The artifact",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "The Abbess",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Determined",
+              "clothing": "Dark brown robes with intricate golden embroidery",
+              "color": "#5C4033",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "A quill pen tucked behind her ear",
+              "Faint ink stains on her fingertips",
+              "A heavy, leather-bound tome open in front of her",
+              "Specs of dust floating around her, highlighted by the sunlight",
+              "A small, ornate locket visible at her neck"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Natural sunlight casts colorful patterns on the floor"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "quiet, distant bell chimes",
+          "description": "signifying the early hour of the day"
+        }
+      ],
+      "mood": "Mystical",
+      "pacing": "Slow",
+      "id": 9
+    },
+    {
+      "text_segment": "Not every phantom the child spoke to had made it into the annals of history, and some that had were never acknowledged as having close ties to an Avatar. Jetsun could only imagine the stories lost to time, filtering through the girl, merest fragments sticking in her throat. And the conversations were pleasant, frequently enough. She would laugh with her friends in towns that had been renamed, provinces that no longer existed. Jetsun had watched her leap from her bed and bellow at the success of legendary winter hunts, sit on the floor and meditate with someone else\u2019s inner peace.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The room is dimly lit, illuminated by the first light of dawn peeking through a small window. The walls are adorned with ancient tapestries, depicting scenes of old, forgotten battles and serene landscapes of provinces no longer recognized. A small, unmade bed sits in one corner, while various artifacts and scrolls are scattered throughout the room, suggesting a deep, historical research or connection. Jetsun stands in the doorway, observing the child, who is centered in the frame, engaged in different activities that bridge the gap between the physical and the spiritual world.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#8D5524",
+            "#D2B48C"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot",
+          "depth_of_field": "Medium (f/4-f/5.6)",
+          "focal_point": "The child",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Background-right",
+            "prominence": "Background",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Observant",
+              "clothing": "Flowing robes of deep maroon (#800020), accented with gold embroidery (#FFD700)",
+              "color": "#800020, #FFD700",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "A slight frown of concentration",
+              "Hands clasped behind back",
+              "A single strand of grey hair amidst the black"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "The child",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Joyful",
+              "clothing": "Simple linen tunic (#F0E68C), pants (#8FBC8F)",
+              "color": "#F0E68C, #8FBC8F",
+              "texture": "Linen (worn)",
+              "lighting_on_object": "Softly lit"
+            },
+            "micro_details": [
+              "Bare feet",
+              "A small, half-finished clay figurine beside her",
+              "Eyes closed, lips moving in silent conversation"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun's shadow falls onto the wooden floor, slightly overlapping with the edge of the bed"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "soft morning birds",
+          "description": "The gentle chirping of birds outside, suggesting a peaceful morning"
+        }
+      ],
+      "mood": "Reflective",
+      "pacing": "Slow",
+      "id": 10
+    },
+    {
+      "text_segment": "But occasionally she would have waking nightmares. Bouts of sorrow and rage that threatened to tear her apart. She wouldn\u2019t mutter names but scream them as if she\u2019d been betrayed by the universe itself. By accident, they discovered she could sometimes be calmed by figuring out the past figure she was talking to, when it was possible, and speaking back to her from that perspective. The deeper they could dive into the role the better, like parents reading a bedtime story, doing voices and parts. Familiarity was the best balm they had, and they acted their hearts out for her.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The scene unfolds in a sparsely furnished, dimly lit room during the twilight hours of dawn. The atmosphere is thick with a palpable mix of tension and anticipation. The weather outside contributes to the scene's moodiness, with a serene but eerily quiet ambiance, as if the world itself is holding its breath. Inside, the only source of light is the soft, diffused natural sunlight seeping through a half-open window, casting long shadows and highlighting the expressions of intense emotion on the characters' faces.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Cool (6500K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#567D8E",
+            "#2A2F36"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "High"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Shallow (f/1.4-f/2.8)",
+          "focal_point": "Character's eyes",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "The tormented character",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Angry",
+              "clothing": "A tattered gown, as described in Character Bible",
+              "color": "#8A2432",
+              "texture": "Leather (worn)",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Tears streaking down her face",
+              "Fists clenched in her lap",
+              "A single, crumpled photograph in her hand",
+              "Bare feet tapping anxiously on the cold floor",
+              "Hair disheveled, as if she had been tossing in her sleep"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "The soft light casts long shadows behind the characters, emphasizing the mood of isolation and despair"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "ambient_dawn_chirping",
+          "description": "The serene yet eerie chirping of birds at dawn sets a contrasting backdrop to the tense scene inside."
+        },
+        {
+          "timestamp": "throughout",
+          "sfx": "soft_whispering",
+          "description": "The murmurs and whispers of the characters trying to calm the tormented character, barely breaking the tense silence."
+        }
+      ],
+      "mood": "Tense",
+      "pacing": "Slow",
+      "id": 11
+    },
+    {
+      "text_segment": "The girl nodded off by the time Jetsun reached a chapter on the proper construction of seawalls. Tsering entered the room. No glider, Jetsun noticed. She probably wanted to see if she could still make the jump too. \u201cHow is she?\u201d the librarian asked. \u201cBetter,\u201d Jetsun said. \u201cWho was Mesose?\u201d \u201cA companion of Avatar Gun,\u201d Tsering said, coming over to the bedside. \u201cSkilled poet and engineer, who died in Ha\u2019an when Gun failed to hold back a tsunami.\u201d Jetsun found a sour taste rising in her mouth.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "The scene unfolds in a dimly lit, spacious library room adorned with ancient scrolls and books, where the ambient glow of dawn seeps through large, ornate windows. The air feels heavy with knowledge and the silent weight of history. Jetsun, an aged librarian with wisdom etched into her features, is seated beside a small bed where a young girl lies sleeping, the room imbued with a sense of tranquility and the lingering promise of adventure.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#DAA520",
+            "#8B4513"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "The bedside",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Determined",
+              "clothing": "Traditional robes, layered and functional",
+              "color": "#6A5ACD",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Wrinkles around the eyes",
+              "A jade pendant around her neck",
+              "Intricate ring on her left hand signifying her rank"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Tsering",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Left-third",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Curious",
+              "clothing": "Explorer's gear with reinforced leather",
+              "color": "#228B22",
+              "texture": "Leather (worn)",
+              "lighting_on_object": "Shadow-side"
+            },
+            "micro_details": [
+              "A leather band around her wrist",
+              "Goggles pushed up onto her forehead",
+              "Dust on her boots"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Jetsun casts shadow on the bed"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "ambient library sounds",
+          "description": "Whispers of turning pages, the distant sound of a bird greeting the dawn"
+        }
+      ],
+      "mood": "Serene",
+      "pacing": "Slow",
+      "id": 12
+    },
+    {
+      "text_segment": "\u201cFailed?\u201d Not the choice of words she would have used for someone, Avatar or not, bravely confronting a force of nature. Ha\u2019an still stood today as a port when it sounded like it could have been wiped off the map along with everyone who\u2019d lived there at the time. \u201cIt\u2019s what\u2019s written. After Mesose drowned, Gun disappeared for quite a while before returning to duty.\u201d You were grieving.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "This scene unfolds in a dimly lit, spacious room filled with ancient artifacts and maps detailing various mythical locations. The atmosphere is heavy with the weight of history and the solemnity of the conversation. Two characters stand facing each other, the tension between them palpable. The room is lit by the early rays of dawn filtering through a large window, casting long shadows and highlighting the dust motes dancing in the air.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Clear",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#D6D2C4",
+            "#A4978E"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Medium-shot",
+          "depth_of_field": "Shallow (f/1.4-f/2.8)",
+          "focal_point": "Character's eyes",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "CHARACTER_NAME",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Determined",
+              "clothing": "Long, flowing robe adorned with ancient symbols",
+              "color": "#7A6F64",
+              "texture": "Silk",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "A small tear in the fabric near the hem of the robe",
+              "A faint scar across the left cheek, barely visible",
+              "Tightly clenched fists, knuckles whitening",
+              "A weathered leather belt with an intricate buckle",
+              "Eyes that seem to hold a universe of stories"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Character's shadow stretches towards the other character"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "ambient room tone",
+          "description": "A soft, almost inaudible hum of the early morning outside, mingled with the faint rustling of pages as the characters speak."
+        }
+      ],
+      "mood": "Tense",
+      "pacing": "Slow",
+      "id": 13
+    },
+    {
+      "text_segment": "If the waters that Gun fought were the same ones that killed Mesose, then both the girl and the past life raging through her might have personally witnessed their friend take their last breath before plunging below the waves. They would have searched for a body in the wreckage. And worst of all, Jetsun thought, they would have had to struggle with the terrible question of what if I\u2019d done things differently? What if, what if, what if? Perhaps Gun was the one who\u2019d demanded the label of failure. It was simply unjust. To remember the events of a single life was painful enough.",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "This scene is a poignant, emotionally charged moment where Jetsun reflects on Gun's internal turmoil and the painful memories of losing Mesose at sea. It captures the essence of mourning and introspection, set against the backdrop of a tumultuous sea at dawn, symbolizing a new beginning yet carrying the weight of the past.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Backlit",
+            "quality": "Soft",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#547E8C",
+            "#AABDC4"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Eye-level",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "Jetsun",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "50mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "100",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Standing",
+              "expression": "Reflective",
+              "clothing": "Aged leather coat and rugged seafarer boots",
+              "color": "#5E3A1B for the coat, #423D3D for the boots",
+              "texture": "Leather (worn)",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Salt-stained edges on the coat",
+              "Frayed cuffs",
+              "A small, intricately designed compass pendant around the neck"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Natural sunlight casts long shadows behind Jetsun"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "gentle_waves",
+          "description": "The soft, rhythmic sound of waves lapping against the shore sets a contemplative mood."
+        }
+      ],
+      "mood": "Reflective",
+      "pacing": "Slow",
+      "id": 14
+    },
+    {
+      "text_segment": "Reliving dozens of lives would be . . . well, it would be like getting caught by a tsunami. Swept away by forces beyond your control. \u201cShe\u2019s a smart kid,\u201d Jetsun said. \u201cIf she keeps having these visions, she\u2019ll figure out who she is long before she turns sixteen.\u201d Tsering sighed. She reached out and stroked the sleeping girl\u2019s hair, now matted with sweat. \u201cOh, little Yangchen,\u201d she said. \u201cWhat are we going to do with you?\u201d",
+      "visual_prompt": {
+        "global_context": {
+          "scene_description": "An ancient, dimly lit chamber, with walls adorned with faded tapestries and relics of past lives scattered around. The early rays of dawn filter through a small aperture, casting a serene yet eerie glow over the scene. Tsering and Jetsun are seated on the floor, their attention focused on the sleeping girl, Yangchen, who lies on a simple, aged bed. The air is thick with anticipation and the weight of unspoken worries.",
+          "time_of_day": "Dawn",
+          "weather_atmosphere": "Serene",
+          "lighting": {
+            "source": "Natural sunlight",
+            "direction": "Side-lit",
+            "quality": "Diffused",
+            "color_temp": "Warm (3000K)"
+          }
+        },
+        "color_palette": {
+          "dominant_hex": [
+            "#DAA520",
+            "#8B4513"
+          ],
+          "accent_colors": [
+            "Neon pink",
+            "Electric blue"
+          ],
+          "contrast_level": "Medium"
+        },
+        "composition": {
+          "camera_angle": "Low-angle",
+          "framing": "Wide-shot",
+          "depth_of_field": "Deep (f/11-f/22)",
+          "focal_point": "The sleeping girl's face",
+          "aspect_ratio": "2.39:1",
+          "lens": {
+            "focal_length": "24mm",
+            "type": "Prime",
+            "distortion": "None"
+          },
+          "camera_settings": {
+            "iso": "800",
+            "shutter_speed": "1/60s",
+            "white_balance": "Daylight (5500K)"
+          }
+        },
+        "objects": [
+          {
+            "id": "char_001",
+            "label": "Tsering",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_001",
+            "location": "Left-third",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Worried",
+              "clothing": "Traditional robe, dark red, #8B0000",
+              "color": "#8B0000",
+              "texture": "Silk",
+              "lighting_on_object": "Shadow-side"
+            },
+            "micro_details": [
+              "Wrinkled forehead",
+              "Eyes downcast",
+              "Hands gently touching the girl's hair"
+            ]
+          },
+          {
+            "id": "char_002",
+            "label": "Jetsun",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_002",
+            "location": "Background-right",
+            "prominence": "Midground",
+            "visual_attributes": {
+              "pose": "Sitting",
+              "expression": "Pensive",
+              "clothing": "Monk's robe, saffron, #FFA500",
+              "color": "#FFA500",
+              "texture": "Cotton",
+              "lighting_on_object": "Rim-lit"
+            },
+            "micro_details": [
+              "Folded hands",
+              "Slight frown",
+              "Eyes fixed on Yangchen"
+            ]
+          },
+          {
+            "id": "char_003",
+            "label": "Yangchen",
+            "category": "Person",
+            "character_bible_ref": "char_bible_id_003",
+            "location": "Center-frame",
+            "prominence": "Foreground",
+            "visual_attributes": {
+              "pose": "Sleeping",
+              "expression": "Peaceful",
+              "clothing": "Simple linen tunic, pale blue, #ADD8E6",
+              "color": "#ADD8E6",
+              "texture": "Linen",
+              "lighting_on_object": "Diffused"
+            },
+            "micro_details": [
+              "Sweat on forehead",
+              "Slight smile",
+              "Disheveled hair"
+            ]
+          }
+        ],
+        "semantic_relationships": [
+          "Tsering's shadow falls softly on Yangchen"
+        ]
+      },
+      "audio_cues": [
+        {
+          "timestamp": "start",
+          "sfx": "ambient_cave",
+          "description": "The low, continuous murmur of the outside world barely reaching the chamber, mixed with the subtle rustle of the tapestries in the faint breeze."
+        }
+      ],
+      "mood": "Tense",
+      "pacing": "Slow",
+      "id": 15
     }
   ]
 }
