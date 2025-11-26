@@ -32,26 +32,13 @@ class JobManager:
         self.message = "Ready"
         self.result_path = None
         self.error = None
+        # Legacy attributes (keep for compatibility)
         self._lock = threading.Lock()
         
-    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
-        """Start a generation job in a background thread."""
-        with self._lock:
-            if self.status == "RUNNING":
-                return False, "Job already running"
-            
-            self.status = "RUNNING"
-            self.progress = 0.0
-            self.message = "Starting..."
-        # self.status = "IDLE"  # IDLE, RUNNING, COMPLETED, FAILED
-        # self.progress = 0.0
-        # self.message = "Ready"
-        # self.result_path = None
-        # self.error = None
-        # self._lock = threading.Lock()
+        # New multi-job system
         self.jobs = {}  # Stores status for multiple jobs
-        self.lock = threading.Lock()
-        self.current_job_id = None # To track the currently active job for UI polling
+        self.lock = threading.Lock()  # NEW: Ensure this is initialized
+        self.current_job_id = None  # To track the currently active job for UI polling
 
     def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, llm_provider=None, detect_sfx=False):
         """Start a new background job."""
