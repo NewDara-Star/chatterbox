@@ -266,6 +266,16 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                         label="Book Title",
                         placeholder="e.g., The Dawn of Yangchen"
                     )
+                    provider_radio = gr.Radio(
+                        choices=["Anthropic", "OpenAI"],
+                        value="Anthropic",
+                        label="AI Provider"
+                    )
+                    api_key_input = gr.Textbox(
+                        label="API Key (Optional if set in .env)",
+                        type="password",
+                        placeholder="Leave blank to use .env key"
+                    )
                     analyze_book_btn = gr.Button("🔍 Analyze Book & Generate Character Bible", variant="primary")
                 
                 with gr.Column(scale=1):
@@ -287,11 +297,19 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                         visible=False
                     )
             
-            def analyze_full_book(book_file, book_title):
+            def analyze_full_book(book_file, book_title, provider, api_key):
                 """Analyze full book to generate Character Bible."""
                 if not book_file:
                     return (
                         "❌ Please upload a book file",
+                        gr.update(visible=False),
+                        gr.update(visible=False),
+                        gr.update(visible=False)
+                    )
+                
+                if not provider:
+                    return (
+                        "❌ Please select an AI provider (Anthropic or OpenAI)",
                         gr.update(visible=False),
                         gr.update(visible=False),
                         gr.update(visible=False)
@@ -305,8 +323,14 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     parser = DocumentParser()
                     book_text, metadata = parser.parse_document(book_file.name)
                     
+                    # Map provider name to lowercase
+                    provider_name = provider.lower()
+                    
                     # Analyze with Director Mode 1
-                    director = Director(provider="anthropic")  # Default to Anthropic
+                    director = Director(
+                        provider=provider_name,
+                        api_key=api_key if api_key else None
+                    )
                     result = director.analyze_full_book(book_text, book_title or "Untitled")
                     
                     # Save Character Bible
@@ -334,7 +358,7 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
             
             analyze_book_btn.click(
                 fn=analyze_full_book,
-                inputs=[book_file_input, book_title_input],
+                inputs=[book_file_input, book_title_input, provider_radio, api_key_input],
                 outputs=[book_analysis_status, character_bible_output, extraction_report_output, download_bible_btn]
             )
         
