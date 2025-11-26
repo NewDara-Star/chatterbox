@@ -53,14 +53,14 @@ class JobManager:
         self.lock = threading.Lock()
         self.current_job_id = None # To track the currently active job for UI polling
 
-    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False):
+    def start_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, llm_provider=None, detect_sfx=False):
         """Start a new background job."""
         job_id = str(uuid.uuid4())
         
         # Create thread
         thread = threading.Thread(
             target=self._run_job,
-            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx),
+            args=(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, llm_provider, detect_sfx),
             kwargs={'job_id': job_id}
         )
         
@@ -79,11 +79,13 @@ class JobManager:
         thread.start()
         return 0.0, "Starting job..."
 
-    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, detect_sfx=False, job_id=None):
+    def _run_job(self, file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup=False, llm_provider=None, detect_sfx=False, job_id=None):
         """Worker function."""
         try:
             # Initialize generator here to pass parameters dynamically
             generator = AudiobookGenerator()
+            generator.use_llm_cleanup = use_llm_cleanup
+            generator.llm_provider = llm_provider
             
             # Determine which voice to use
             voice_path = None
@@ -198,24 +200,22 @@ def analyze_document(file):
     except Exception as e:
         return f"Error analyzing document: {str(e)}", "", ""
 
-def start_generation(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, detect_sfx):
+def start_generation(file_path, voice_name, custom_voice_file, exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty, use_llm_cleanup, llm_provider, detect_sfx):
     """Trigger the background generation job."""
     if not file_path:
         raise gr.Error("Please upload and analyze a document first.")
     
     # Defensive check: if a voice_name is selected, verify it exists
     if voice_name and not custom_voice_file:
-        available_voices = [v['name'] for v in voice_manager.list_voices()]
-        if voice_name not in available_voices:
-            raise gr.Error(
-                f"Voice '{voice_name}' not found. Available voices: {', '.join(available_voices)}. "
-                f"Try refreshing the voice list or re-uploading the voice."
-            )
-        
+        try:
+            voice_path = voice_manager.get_voice_path(voice_name)
+        except ValueError:
+            raise gr.Error(f"Voice '{voice_name}' not found. Please refresh voices or upload a custom reference.")
+    
     progress_val, msg = job_manager.start_job(
         file_path, voice_name, custom_voice_file, 
         exaggeration, temperature, cfg_weight, min_p, top_p, repetition_penalty,
-        detect_sfx
+        use_llm_cleanup, llm_provider, detect_sfx
     )
     
     return gr.update(value=progress_val, visible=True), msg
@@ -435,6 +435,21 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     info="Slower but removes artifacts more intelligently"
                 )
                 
+                llm_provider_dropdown = gr.Dropdown(
+                    label="LLM Provider for Cleanup",
+                    choices=["anthropic", "openai"],
+                    value="anthropic",
+                    visible=False,
+                    info="Which AI to use for text cleanup"
+                )
+                
+                # Show provider dropdown when cleanup is enabled
+                use_llm_cleanup.change(
+                    fn=lambda enabled: gr.update(visible=enabled),
+                    inputs=[use_llm_cleanup],
+                    outputs=[llm_provider_dropdown]
+                )
+                
                 detect_sfx = gr.Checkbox(
                     label="Generate and mix sound effects (Experimental)",
                     value=False,
@@ -478,6 +493,7 @@ with gr.Blocks(title="Chatterbox Audiobook Converter") as demo:
                     top_p,
                     repetition_penalty,
                     use_llm_cleanup,
+                    llm_provider_dropdown,
                     detect_sfx
                 ],
                 outputs=[timer, status_msg] # Enable timer

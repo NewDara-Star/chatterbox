@@ -62,19 +62,20 @@ class AudiobookGenerator:
             self.num_workers = max(1, min(multiprocessing.cpu_count() - 2, 8))
             print(f"Parallel processing enabled: {self.num_workers} workers")
     
-    def prepare_chapters(self, input_path: str, use_llm_cleanup: bool = False) -> List[Tuple[str, str]]:
+    def prepare_chapters(self, input_path: str, use_llm_cleanup: bool = False, llm_provider: str = None) -> List[Tuple[str, str]]:
         """
         Prepare chapters from input document.
         
         Args:
             input_path: Path to input document
             use_llm_cleanup: Whether to use LLM for intelligent text cleanup
+            llm_provider: LLM provider for cleanup ("anthropic" or "openai")
             
         Returns:
             List of (chapter_title, chapter_text) tuples
         """
         print(f"Preparing chapters from: {input_path}")
-        parser = DocumentParser(use_llm_cleanup=use_llm_cleanup)
+        parser = DocumentParser(use_llm_cleanup=use_llm_cleanup, llm_provider=llm_provider)
         text, metadata = parser.parse_document(input_path)
         
         # Split into chapters (enforcing 30k limit)
@@ -345,7 +346,12 @@ class AudiobookGenerator:
         # Step 1: Prepare chapters
         if progress_callback:
             progress_callback(0.05, "Preparing chapters...")
-        chapters = self.prepare_chapters(input_path, use_llm_cleanup=use_llm_cleanup)
+        
+        # Use instance variables if set (from JobManager)
+        llm_provider_to_use = getattr(self, 'llm_provider', None )
+        use_cleanup = use_llm_cleanup and llm_provider_to_use
+        
+        chapters = self.prepare_chapters(input_path, use_llm_cleanup=use_cleanup, llm_provider=llm_provider_to_use)
         
         # 2. Prepare Voice
         ref_voice_path = None
