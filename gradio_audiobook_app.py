@@ -205,7 +205,7 @@ def start_generation(file_path, voice_name, custom_voice_file, exaggeration, tem
         use_llm_cleanup, llm_provider, detect_sfx
     )
     
-    return gr.update(value=progress_val, visible=True), msg
+    return timer, msg
 
 def check_progress():
     """Poll for progress updates."""
