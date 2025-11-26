@@ -252,8 +252,7 @@ class DocumentParser:
         load_dotenv()
         
         if not self.llm_provider:
-            # Default to Anthropic
-            self.llm_provider = "anthropic"
+            raise ValueError("LLM provider must be specified for text cleanup. Set llm_provider='anthropic' or 'openai'")
         
         if self.llm_provider == "anthropic":
             import anthropic

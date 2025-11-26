@@ -13,7 +13,7 @@ import torch
 import torchaudio
 import numpy as np
 from pathlib import Path
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Tuple
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing
 import gc
